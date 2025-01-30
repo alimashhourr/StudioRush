@@ -1,21 +1,27 @@
 import pygame
 
-class Chef(pygame.sprite.Sprite):
-    def __init__(self, idle_animation, run_animations, x, y, screen_width, screen_height):
-        super().__init__()  
-        self.idle_animation = idle_animation 
-        self.run_animations = run_animations  
-        self.current_animation = idle_animation  
+class Player():
+    def __init__(self, x, y, screen_width, screen_height):
+
+        #images
+        self.idle_animation = [pygame.image.load(f"assets/images/player/idle_1.png")]   
+        self.run_animations = {
+            "up": [pygame.image.load(f"assets/images/player/run_up_{i}.png") for i in range(1, 5)],
+            "down": [pygame.image.load(f"assets/images/player/run_down_{i}.png") for i in range(1, 5)], 
+            "left": [pygame.image.load(f"assets/images/player/run_left_{i}.png") for i in range(1, 5)],
+            "right": [pygame.image.load(f"assets/images/player/run_right_{i}.png") for i in range(1, 5)],
+        }
+        self.current_animation = self.idle_animation  
         self.current_frame = 0  
         self.image = self.current_animation[self.current_frame]  
         self.rect = self.image.get_rect(topleft=(x, y))  
         self.screen_width = screen_width  
         self.screen_height = screen_height 
-        self.speed = 5 
+        self.speed = 100
         self.direction = "down" 
         self.is_moving = False  
         self.animation_speed = 0.1  # Speed of animation 
-        self.time_since_last_frame = 0  
+        self.time_since_last_frame = 0
         
 
     def move(self, dx, dy):
@@ -31,19 +37,19 @@ class Chef(pygame.sprite.Sprite):
 
         # Movement
         if keys[pygame.K_w]: 
-            dy -= self.speed
+            dy -= self.speed * dt
             self.direction = "up"
             self.is_moving = True
         if keys[pygame.K_s]:  
-            dy += self.speed
+            dy += self.speed * dt
             self.direction = "down"
             self.is_moving = True
         if keys[pygame.K_a]: 
-            dx -= self.speed
+            dx -= self.speed * dt
             self.direction = "left"
             self.is_moving = True
         if keys[pygame.K_d]:
-            dx += self.speed
+            dx += self.speed * dt
             self.direction = "right"
             self.is_moving = True
 
