@@ -3,7 +3,6 @@ from utils import resize_img
 
 class Player():
     def __init__(self, x, y, screen_width, screen_height):
-
         self.idle_animation = [resize_img(pygame.image.load(f"assets/images/player/player_idle_{i}.png"), height=100) for i in range(4)]
         self.walk_animation = [resize_img(pygame.image.load(f"assets/images/player/player_walk_{i}.png"), height=100) for i in range(6)]
         self.current_animation = self.idle_animation
@@ -11,47 +10,66 @@ class Player():
         self.animation_speed = 0.1  # Temps entre chaque frame de l'animation
         self.time_since_last_frame = 0
         self.image = self.current_animation[self.current_frame]
+        self.rect = self.image.get_rect(x=x, y=y)
         self.dir = 'right'
-        self.rect = self.image.get_rect(topleft=(x, y))
+
+        self.hitbox = pygame.Rect(0, 0, self.rect.width*0.8, self.rect.height/4) # Seuls les pieds du joueur sont en collision avec les tiles
+        self.hitbox.midbottom = self.rect.midbottom
+        
+        self.speed = 200
+        self.vel = [0, 0]
+        self.is_moving = False
+
         self.screen_width = screen_width
         self.screen_height = screen_height
-        self.speed = 200
-        self.is_moving = False
 
-    def move(self, dx, dy):
-        self.rect.x += dx
-        self.rect.y += dy
+    def update(self, dt, grid):
+        # MOUVEMENT
+        if self.vel[0] != 0 or self.vel[1] != 0:
+            self.is_moving = True
+        else:
+            self.is_moving = False
 
-        # Empêcher le joueur de sortir de l'écran
-        self.rect.x = max(0, min(self.rect.x, self.screen_width - self.rect.width))
-        self.rect.y = max(0, min(self.rect.y, self.screen_height - self.rect.height))
+        dx = self.vel[0] * self.speed * dt
+        dy = self.vel[1] * self.speed * dt
 
-    def update(self, keys, dt):
-        dx, dy = 0, 0
-        self.is_moving = False
-
-        # Mouvement
-        if keys[pygame.K_w]:
-            dy -= self.speed * dt
-            self.is_moving = True
-        if keys[pygame.K_s]:
-            dy += self.speed * dt
-            self.is_moving = True
-        if keys[pygame.K_a]:
-            dx -= self.speed * dt
-            self.is_moving = True
-        if keys[pygame.K_d]:
-            dx += self.speed * dt
-            self.is_moving = True
-        
         # Vitesse de déplacement diagonale
-        if dx != 0 and dy != 0:
-            dx /= 1.4142 # sqrt(2)
-            dy /= 1.4142 # sqrt(2)
+        if self.vel[0] != 0 and self.vel[1] != 0:
+            dx /= 1.41 # sqrt(2)
+            dy /= 1.41 # sqrt(2)
         
-        self.move(dx, dy)
+        # Déplacement horizontal
+        self.hitbox.x += dx
 
-        # Animation
+        # Collision avec les tiles
+        for line in grid:
+            for tile in line:
+                if tile and self.hitbox.colliderect(tile.rect):
+                    if dx > 0:
+                        self.hitbox.right = tile.rect.left
+                    elif dx < 0:
+                        self.hitbox.left = tile.rect.right
+
+        # Déplacement vertical
+        self.hitbox.y += dy
+
+        # Collision avec les tiles
+        for line in grid:
+            for tile in line:
+                if tile and self.hitbox.colliderect(tile.rect):
+                    if dy > 0:
+                        self.hitbox.bottom = tile.rect.top
+                    elif dy < 0:
+                        self.hitbox.top = tile.rect.bottom
+                
+        # Empêcher le joueur de sortir de l'écran
+        self.hitbox.x = max(0, min(self.hitbox.x, self.screen_width - self.rect.width))
+        self.hitbox.y = max(0, min(self.hitbox.y, self.screen_height - self.rect.height))
+
+        # Placer le rect du joueur sur la hitbox
+        self.rect.midbottom = self.hitbox.midbottom
+
+        # ANIMATION
         self.time_since_last_frame += dt
 
         if self.time_since_last_frame >= self.animation_speed:
