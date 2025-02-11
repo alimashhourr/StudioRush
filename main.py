@@ -11,16 +11,15 @@ class Game:
         self.running = True
 
         # Objet joueur
-        self.player = Player(100, 100, self.screen.get_width(), self.screen.get_height())
+        self.player = Player(400, 500, self.screen.get_width(), self.screen.get_height())
 
         # Grille de tiles
         self.tile_size = 100
         self.grid = [
             [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,1,1,1,1,1,0,1,0],
+            [0,0,1,1,1,1,1,1,1,0],
             [0,0,1,0,0,1,0,0,1,0],
-            [0,0,0,0,0,1,0,0,1,0],
+            [0,0,1,0,0,1,0,0,1,0],
             [0,0,1,0,0,1,0,0,1,0],
             [0,0,1,0,0,0,0,0,1,0],
             [0,0,1,1,1,1,1,1,1,0],
@@ -84,7 +83,7 @@ class Game:
             self.dt = self.clock.tick(self.FPS) / 1000
 
 pygame.init()
-screen = pygame.display.set_mode((1000, 1000))
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 pygame.display.set_caption("Studio Rush")
 
 game = Game(screen)
