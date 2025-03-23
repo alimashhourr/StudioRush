@@ -10,4 +10,4 @@ class Guitar():
         pass
     
     def draw(self, screen):
-        screen.blit(self.img, self.rect)
+        pass

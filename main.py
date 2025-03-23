@@ -13,7 +13,7 @@ class Game:
         self.running = True
         
         # Charger le fond
-        self.background = resize_img(pygame.image.load("assets/images/city.png"), width=screen.get_width())
+        self.background = resize_img(pygame.image.load("assets/images/background.png"), width=screen.get_width())
 
         # Objet joueur
         self.player = Player(400, 500, self.screen.get_width(), self.screen.get_height())
@@ -21,26 +21,13 @@ class Game:
         # Guitar
         self.guitar = Guitar(400, 500, 90)
 
-        # Grille de tiles
-        self.tile_size = 60
-        self.grid = [
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-            [0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
-            [0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
-            [0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
-            [0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
-            [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        # Collision
+        self.collisions = [
+            pygame.Rect(340, 430, 20, 560),
+            pygame.Rect(1600, 430, 20, 560),
+            pygame.Rect(340, 430, 1280, 20),
+            pygame.Rect(340, 955, 1280, 20)
         ]
-        
-
-        for y in range(len(self.grid)):
-            for x in range(len(self.grid[y])):
-                if self.grid[y][x]:
-                    self.grid[y][x] = Tile(x+2.5, y+2.2, self.tile_size)
 
     def handling_events(self):
         for event in pygame.event.get():
@@ -69,20 +56,17 @@ class Game:
 
     def update(self):
         now = pygame.time.get_ticks()
-        self.player.update(self.dt, self.grid)
+        self.player.update(self.dt, self.collisions)
+        print(self.player.hitbox.topleft)
 
     def display(self):
         # Dessiner l'image de fond
         self.screen.blit(self.background, (0, 0))
 
-        # Dessiner la grille
-        for line in self.grid:
-            for tile in line:
-                if tile:
-                    tile.draw(self.screen)
-
-        self.guitar.draw(self.screen)
         self.player.draw(self.screen)
+
+        # for rect in self.collisions:
+        #     pygame.draw.rect(self.screen, (255, 0, 0), rect)
 
         # Mettre à jour l'écran
         pygame.display.flip()

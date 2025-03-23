@@ -23,7 +23,7 @@ class Player():
         self.screen_width = screen_width
         self.screen_height = screen_height
 
-    def update(self, dt, grid):
+    def update(self, dt, collisions):
         # MOUVEMENT
         if self.vel[0] != 0 or self.vel[1] != 0:
             self.is_moving = True
@@ -41,26 +41,24 @@ class Player():
         # Déplacement horizontal
         self.hitbox.x += dx
 
-        # Collision avec les tiles
-        for line in grid:
-            for tile in line:
-                if tile and self.hitbox.colliderect(tile.rect):
-                    if dx > 0:
-                        self.hitbox.right = tile.rect.left
-                    elif dx < 0:
-                        self.hitbox.left = tile.rect.right
+        # Collisions
+        for rect in collisions:
+            if self.hitbox.colliderect(rect):
+                if dx > 0:
+                    self.hitbox.right = rect.left
+                elif dx < 0:
+                    self.hitbox.left = rect.right
 
         # Déplacement vertical
         self.hitbox.y += dy
 
         # Collision avec les tiles
-        for line in grid:
-            for tile in line:
-                if tile and self.hitbox.colliderect(tile.rect):
-                    if dy > 0:
-                        self.hitbox.bottom = tile.rect.top
-                    elif dy < 0:
-                        self.hitbox.top = tile.rect.bottom
+        for rect in collisions:
+            if self.hitbox.colliderect(rect):
+                if dy > 0:
+                    self.hitbox.bottom = rect.top
+                elif dy < 0:
+                    self.hitbox.top = rect.bottom
                 
         # Empêcher le joueur de sortir de l'écran
         self.hitbox.x = max(0, min(self.hitbox.x, self.screen_width - self.rect.width))
