@@ -2,6 +2,7 @@ import pygame
 from utils import resize_img
 from player import Player
 from instrument import Instrument
+from track import Track
 
 class Game:
     def __init__(self, screen: pygame.Surface):
@@ -16,15 +17,14 @@ class Game:
 
         # Objet joueur
         self.player = Player(405, 510, self.screen.get_width(), self.screen.get_height())
-        
-        # Instruments
-        self.instruments = {
-            "guitar": Instrument("guitar", 574, 772),
-            "bass": Instrument("bass", 1005, 375),
-            "drums": Instrument("drums", 927, 750),
-            "piano": Instrument("piano", 679, 440),
-            "computer": Instrument("computer", 1391, 374)
-        }
+
+        self.instruments = [
+            Instrument("guitar", 574, 772),
+            Instrument("bass", 1005, 375),
+            Instrument("drums", 927, 750),
+            Instrument("piano", 679, 440),
+            Instrument("computer", 1391, 374)
+        ]
 
         # Collision
         self.collisions = [
@@ -34,7 +34,11 @@ class Game:
             pygame.Rect(340, 955, 1280, 20)
         ]
 
-        self.on_guitar = False
+        # Pistes
+        self.tracks = []
+        self.selected_track = 0
+        
+        self.tracks.append(Track(["guitar", "bass", "drums", "piano", "computer"]))
 
     def handling_events(self):
         for event in pygame.event.get():
@@ -46,7 +50,11 @@ class Game:
                 elif event.key == pygame.K_d:
                     self.player.dir = 'right'
                 if event.key == pygame.K_SPACE:
-                    pass
+                    for instrument in self.instruments:
+                        if self.player.rect.colliderect(instrument.rect) and len(self.tracks):
+                            instrument.play()
+                            self.tracks[self.selected_track].add(instrument.name)
+                            print(self.tracks[self.selected_track].instruments)
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
@@ -66,9 +74,8 @@ class Game:
     def update(self):
         now = pygame.time.get_ticks()
         self.player.update(self.dt, self.collisions)
-        print(self.player.hitbox.topleft)
         
-        for instrument in self.instruments.values():
+        for instrument in self.instruments:
             instrument.update()
 
     def display(self):
@@ -76,11 +83,8 @@ class Game:
         self.screen.blit(self.background, (0, 0))
 
         # Dessiner le instruments
-        for instrument in self.instruments.values():
-            if self.player.rect.colliderect(instrument.rect):
-                screen.blit(instrument.img_highlight, instrument.rect)
-            else:
-                screen.blit(instrument.img, instrument.rect)
+        for instrument in self.instruments:
+            instrument.draw(self.screen, self.player)
 
         # Dessiner le joueur
         self.player.draw(self.screen)
