@@ -103,7 +103,7 @@ class Game:
             self.dt = self.clock.tick(self.FPS) / 1000
 
 pygame.init()
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((1920, 1080), pygame.SCALED | pygame.FULLSCREEN)
 pygame.display.set_caption("Studio Rush")
 
 game = Game(screen)
