@@ -54,7 +54,6 @@ class Game:
                         if self.player.rect.colliderect(instrument.rect) and len(self.tracks):
                             instrument.play()
                             self.tracks[self.selected_track].add(instrument.name)
-                            print(self.tracks[self.selected_track].instruments)
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
@@ -72,11 +71,11 @@ class Game:
             self.player.vel[0] = 0
 
     def update(self):
-        now = pygame.time.get_ticks()
+        now = pygame.time.get_ticks() / 1000
         self.player.update(self.dt, self.collisions)
         
         for instrument in self.instruments:
-            instrument.update()
+            instrument.update(now)
 
     def display(self):
         # Dessiner l'image de fond
@@ -104,6 +103,7 @@ class Game:
 
 pygame.init()
 screen = pygame.display.set_mode((1920, 1080), pygame.SCALED | pygame.FULLSCREEN)
+
 pygame.display.set_caption("Studio Rush")
 
 game = Game(screen)
