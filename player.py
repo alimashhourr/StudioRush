@@ -3,8 +3,8 @@ from utils import resize_img
 
 class Player():
     def __init__(self, x, y, screen_width, screen_height):
-        self.idle_animation = [resize_img(pygame.image.load(f"assets/images/player/player_idle_{i}.png"), height=100) for i in range(4)]
-        self.walk_animation = [resize_img(pygame.image.load(f"assets/images/player/player_walk_{i}.png"), height=100) for i in range(6)]
+        self.idle_animation = [resize_img(pygame.image.load(f"assets/images/player/player_idle_{i}.png"), height=120) for i in range(4)]
+        self.walk_animation = [resize_img(pygame.image.load(f"assets/images/player/player_walk_{i}.png"), height=120) for i in range(6)]
         self.current_animation = self.idle_animation
         self.current_frame = 0
         self.animation_speed = 0.08  # Temps entre chaque frame de l'animation
