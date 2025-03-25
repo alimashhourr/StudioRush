@@ -2,6 +2,7 @@ import pygame
 from utils import resize_img
 from player import Player
 from instrument import Instrument
+from instruments.guitar import Guitar
 from track import Track
 
 class Game:
@@ -19,7 +20,7 @@ class Game:
         self.player = Player(405, 510, self.screen.get_width(), self.screen.get_height())
 
         self.instruments = [
-            Instrument("guitar", 574, 772),
+            Guitar(574, 772),
             Instrument("bass", 1005, 375),
             Instrument("drums", 927, 750),
             Instrument("piano", 679, 440),
@@ -56,7 +57,7 @@ class Game:
                 elif event.key in [pygame.K_LEFT, pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT]:
                     for instrument in self.instruments:
                         if instrument.playing:
-                            win = instrument.arrow_key([pygame.K_LEFT, pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT].index(event.key))
+                            win = instrument.handle_input([pygame.K_LEFT, pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT].index(event.key))
                             if win and len(self.tracks):
                                 self.tracks[self.selected_track].add(instrument.name)
                             break
