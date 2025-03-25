@@ -10,6 +10,7 @@ class Customer:
         self.track = random.choices(instrument_names, k=track_length)
         self.time = track_length*30 + 30
         self.start_time = now
+        self.points = track_length*50
 
         self.img = resize_img(pygame.image.load(f"assets/images/customers/{name}.png"), height=80)
         self.rect = self.img.get_rect(x=x, y=y)
@@ -28,15 +29,31 @@ class Customer:
             return True
         return False
 
+    def is_right_track(self, sent_track):
+        sent_instruments_count = {}
+        my_instruments_tracks = {}
+        for instrument in self.instrument_names:
+            sent_instruments_count[instrument] = 0
+            my_instruments_tracks[instrument] = 0
+        
+        for instrument in sent_track:
+            sent_instruments_count[instrument] += 1
+        
+        for instrument in self.track:
+            my_instruments_tracks[instrument] += 1
+        
+        return sent_instruments_count == my_instruments_tracks
+            
+
     def draw(self, screen, now):
         screen.blit(self.img, self.rect)
-        x = self.rect.right + self.icon_spacing
+        x = self.rect.x + 80
         pygame.draw.rect(screen, (180, 180, 180), (x, self.rect.y, self.track_bar_w, self.track_height + self.timer_bar_height)) # Fond gris
         pygame.draw.rect(screen, (255, 255, 255), (x + 4, self.rect.y + 4, self.track_bar_w - 8, self.track_height - 8)) # Fond blanc pour les instruments
 
         # Dessiner les instruments de la commande
         for i, instrument in enumerate(self.track):
-            screen.blit(self.instruments_icons[self.instrument_names.index(instrument)], (self.rect.right + self.icon_spacing*2 + i*(self.icon_size + self.icon_spacing), self.rect.y + self.icon_spacing))
+            screen.blit(self.instruments_icons[self.instrument_names.index(instrument)], (x + self.icon_spacing + i*(self.icon_size + self.icon_spacing), self.rect.y + self.icon_spacing))
 
         # Dessiner la barre de temps
         time_left = self.time - (now - self.start_time)

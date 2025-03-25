@@ -11,7 +11,7 @@ class Guitar(Instrument):
         self.last_arrow = 0
         self.arrows = []
         self.points = 0
-        self.points_to_win = 15
+        self.points_to_win = 10
 
     def update(self, now, dt, player):
         super().update(now, dt, player)

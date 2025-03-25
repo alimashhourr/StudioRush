@@ -7,6 +7,7 @@ from instrument import Instrument
 from instruments.guitar import Guitar
 from track import Track
 from customer import Customer
+from font import Font
 
 class Game:
     def __init__(self, screen: pygame.Surface):
@@ -16,6 +17,9 @@ class Game:
         self.now = 0
         self.FPS = 30
         self.running = True
+        self.score = 0
+        
+        self.font = Font('assets/images/font', 60)
         
         # Charger le fond
         self.background = resize_img(pygame.image.load("assets/images/studio.png"), width=screen.get_width())
@@ -64,6 +68,7 @@ class Game:
                     for instrument in self.instruments:
                         if self.player.rect.colliderect(instrument.rect):
                             instrument.play()
+                            self.tracks[self.selected_track].add(instrument.name)
                 
                 elif event.key == pygame.K_c: # TESTING
                     self.spawn_customer()
@@ -86,6 +91,9 @@ class Game:
                         self.selected_track -= 1
                         if self.selected_track < 0:
                             self.selected_track = len(self.tracks) - 1
+                    elif event.key == pygame.K_RETURN:
+                        if len(self.tracks) and not self.tracks[self.selected_track].sending:
+                            self.tracks[self.selected_track].send(self.now)
 
         # Player movement
         keys = pygame.key.get_pressed()
@@ -102,6 +110,16 @@ class Game:
             self.player.vel[0] = 1
         else:
             self.player.vel[0] = 0
+    
+    def remove_customer(self, idx):
+        self.customers.pop(idx)
+        self.tracks.pop(idx)
+        
+        if self.selected_track >= idx:
+            self.selected_track -= 1
+            if self.selected_track < 0:
+                self.selected_track = 0
+        
 
     def update(self):
         self.player.update(self.dt, self.collisions)
@@ -112,13 +130,24 @@ class Game:
         self.computer.update(self.now, self.dt, self.player)
 
         despawn_idx = -1
+        for i, track in enumerate(self.tracks):
+            if track.is_sent(self.now):
+                despawn_idx = i
+        
+        if despawn_idx != -1:
+            # Vérifier si la piste est la bonne
+            if self.customers[despawn_idx].is_right_track(self.tracks[despawn_idx].instruments):
+                self.score += self.customers[despawn_idx].points
+            self.remove_customer(despawn_idx)
+            
+
+        despawn_idx = -1
         for i, customer in enumerate(self.customers):
             if customer.update(self.now):
                 despawn_idx = i
         
         if despawn_idx != -1:
-            self.customers.pop(despawn_idx)
-            self.tracks.pop(despawn_idx)
+            self.remove_customer(despawn_idx)
         
     def display(self):
         # Dessiner l'image de fond
@@ -139,7 +168,9 @@ class Game:
 
         # Dessiner l'interface
         for i, track in enumerate(self.tracks):
-            track.draw(self.screen, i, i == self.selected_track)
+            track.draw(self.screen, i, i == self.selected_track, self.now)
+            
+        self.font.display(screen, str(self.score), 100, 1000, 2)
 
         # for rect in self.collisions:
         #     pygame.draw.rect(self.screen, (255, 0, 0), rect)
