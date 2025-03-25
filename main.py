@@ -1,48 +1,55 @@
 import pygame
+import random
+
 from utils import resize_img
 from player import Player
 from instrument import Instrument
 from instruments.guitar import Guitar
 from track import Track
+from customer import Customer
 
 class Game:
     def __init__(self, screen: pygame.Surface):
         self.screen = screen
         self.clock = pygame.time.Clock()
         self.dt = 0
-        self.FPS = 60
+        self.now = 0
+        self.FPS = 30
         self.running = True
         
         # Charger le fond
         self.background = resize_img(pygame.image.load("assets/images/studio.png"), width=screen.get_width())
 
         # Objet joueur
-        self.player = Player(405, 510, self.screen.get_width(), self.screen.get_height())
+        self.player = Player(280, 600, self.screen.get_width(), self.screen.get_height())
+
+        self.instrument_names = ["guitar", "bass", "drums", "piano"]
 
         self.instruments = [
-            Guitar(574, 772),
-            Instrument("bass", 1005, 375),
-            Instrument("drums", 927, 750),
-            Instrument("piano", 679, 440),
+            Guitar(374, 772),
+            Instrument("bass", 805, 375),
+            Instrument("drums", 727, 750),
+            Instrument("piano", 479, 440),
         ]
 
-        self.computer = Instrument("computer", 1391, 374)
+        self.computer = Instrument("computer", 1191, 374)
 
         # Collision
         self.collisions = [
-            pygame.Rect(340, 430, 20, 560),
-            pygame.Rect(1600, 430, 20, 560),
-            pygame.Rect(340, 430, 1280, 20),
-            pygame.Rect(340, 955, 1280, 20)
+            pygame.Rect(140, 430, 20, 560),
+            pygame.Rect(1400, 430, 20, 560),
+            pygame.Rect(140, 430, 1280, 20),
+            pygame.Rect(140, 955, 1280, 20)
         ]
 
         # Pistes
         self.tracks = []
         self.selected_track = 0
         self.max_instruments_per_track = 8
-        
-        for i in range(5):
-            self.tracks.append(Track(["guitar", "bass", "drums", "piano"], "tyler"))
+
+        # Clients
+        self.customer_names = ["tyler", "drake", "cardib", "travis", "lilwayne", "jcole", "eminem", "xxxtentacion"]
+        self.customers = []
 
     def handling_events(self):
         for event in pygame.event.get():
@@ -57,6 +64,9 @@ class Game:
                     for instrument in self.instruments:
                         if self.player.rect.colliderect(instrument.rect):
                             instrument.play()
+                
+                elif event.key == pygame.K_c: # TESTING
+                    self.spawn_customer()
 
                 # Instrument input
                 for instrument in self.instruments:
@@ -94,14 +104,22 @@ class Game:
             self.player.vel[0] = 0
 
     def update(self):
-        now = pygame.time.get_ticks() / 1000
         self.player.update(self.dt, self.collisions)
         
         for instrument in self.instruments:
-            instrument.update(now, self.dt, self.player)
+            instrument.update(self.now, self.dt, self.player)
         
-        self.computer.update(now, self.dt, self.player)
+        self.computer.update(self.now, self.dt, self.player)
 
+        despawn_idx = -1
+        for i, customer in enumerate(self.customers):
+            if customer.update(self.now):
+                despawn_idx = i
+        
+        if despawn_idx != -1:
+            self.customers.pop(despawn_idx)
+            self.tracks.pop(despawn_idx)
+        
     def display(self):
         # Dessiner l'image de fond
         self.screen.blit(self.background, (0, 0))
@@ -115,6 +133,10 @@ class Game:
         # Dessiner le joueur
         self.player.draw(self.screen)
 
+        # Dessiner les clients
+        for customer in self.customers:
+            customer.draw(self.screen, self.now)
+
         # Dessiner l'interface
         for i, track in enumerate(self.tracks):
             track.draw(self.screen, i, i == self.selected_track)
@@ -127,10 +149,19 @@ class Game:
     
     def run(self):
         while self.running:
+            self.now = pygame.time.get_ticks() / 1000
             self.handling_events()
             self.update()
             self.display()
             self.dt = self.clock.tick(self.FPS) / 1000
+    
+    def spawn_customer(self):
+        name = random.choice(self.customer_names)
+        while name in [customer.name for customer in self.customers]:
+            name = random.choice(self.customer_names)
+
+        self.customers.append(Customer(name, self.instrument_names, 1430, 800-100*len(self.customers), self.now))
+        self.tracks.append(Track(self.instrument_names, name))
 
 pygame.init()
 screen = pygame.display.set_mode((1920, 1080), pygame.SCALED | pygame.FULLSCREEN)

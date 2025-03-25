@@ -11,9 +11,9 @@ class Track():
         self.slots_per_line = 4
         self.slots_spacing = 4
         self.slot_size = self.width//self.slots_per_line - self.slots_spacing
-        self.slot_margin = 8
+        self.slot_padding = 8
 
-        icon_size = self.width//self.slots_per_line - self.slot_margin*2
+        icon_size = self.width//self.slots_per_line - self.slot_padding*2
 
         self.customer_img = resize_img(pygame.image.load(f"assets/images/customers/{customer}.png"), self.height//2)
         self.instruments_icons = [resize_img(pygame.image.load(f"assets/images/instruments/{instrument}.png"), icon_size, icon_size) for instrument in instrument_names]
@@ -22,7 +22,7 @@ class Track():
         self.instruments.append(instrument)
 
     def draw(self, screen, idx, selected):
-        x = 350 + (self.width + self.spacing)*idx
+        x = 100 + (self.width + self.spacing)*idx
         if selected:
             pygame.draw.rect(screen, (0, 0, 0), (x - 6, self.spacing - 6, self.width + 12, self.height + 12))
         pygame.draw.rect(screen, (255, 255, 255), (x, self.spacing, self.width, self.height))
@@ -41,4 +41,4 @@ class Track():
 
             pygame.draw.rect(screen, (180, 180, 180), (icon_x, icon_y, self.slot_size, self.slot_size)) # Bordure grise
             pygame.draw.rect(screen, (255, 255, 255), (icon_x + 4, icon_y + 4, self.slot_size - 8, self.slot_size - 8)) # Fond blanc
-            screen.blit(self.instruments_icons[self.instrument_names.index(instrument)], (icon_x + self.slot_margin//2, icon_y + self.slot_margin//2)) # Icone
+            screen.blit(self.instruments_icons[self.instrument_names.index(instrument)], (icon_x + self.slot_padding//2, icon_y + self.slot_padding//2)) # Icone
