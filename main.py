@@ -39,7 +39,8 @@ class Game:
         self.tracks = []
         self.selected_track = 0
         
-        self.tracks.append(Track(["guitar", "bass", "drums", "piano", "computer"]))
+        for i in range(5):
+            self.tracks.append(Track(["guitar", "bass", "drums", "piano"], "tyler"))
 
     def handling_events(self):
         for event in pygame.event.get():
@@ -94,6 +95,10 @@ class Game:
 
         # Dessiner le joueur
         self.player.draw(self.screen)
+
+        # Dessiner l'interface
+        for i, track in enumerate(self.tracks):
+            track.draw(self.screen, i)
 
         # for rect in self.collisions:
         #     pygame.draw.rect(self.screen, (255, 0, 0), rect)
