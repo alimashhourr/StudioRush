@@ -24,8 +24,9 @@ class Game:
             Instrument("bass", 1005, 375),
             Instrument("drums", 927, 750),
             Instrument("piano", 679, 440),
-            Instrument("computer", 1391, 374)
         ]
+
+        self.computer = Instrument("computer", 1391, 374)
 
         # Collision
         self.collisions = [
@@ -56,13 +57,26 @@ class Game:
                     for instrument in self.instruments:
                         if self.player.rect.colliderect(instrument.rect):
                             instrument.play()
-                elif event.key in [pygame.K_LEFT, pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT]:
-                    for instrument in self.instruments:
-                        if instrument.playing:
-                            win = instrument.handle_input([pygame.K_LEFT, pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT].index(event.key))
-                            if win and len(self.tracks) and len(self.tracks[self.selected_track].instruments) < self.max_instruments_per_track:
-                                self.tracks[self.selected_track].add(instrument.name)
-                            break
+
+                # Instrument input
+                for instrument in self.instruments:
+                    if instrument.playing:
+                        add = instrument.handle_input(event.key)
+                        if add and len(self.tracks) and len(self.tracks[self.selected_track].instruments) < self.max_instruments_per_track:
+                            self.tracks[self.selected_track].add(instrument.name)
+                        break
+
+                # Computer input
+                if self.player.rect.colliderect(self.computer.rect):
+                    if event.key == pygame.K_RIGHT:
+                        self.selected_track += 1
+                        if self.selected_track >= len(self.tracks):
+                            self.selected_track = 0
+                    elif event.key == pygame.K_LEFT:
+                        self.selected_track -= 1
+                        if self.selected_track < 0:
+                            self.selected_track = len(self.tracks) - 1
+
         # Player movement
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
@@ -85,21 +99,25 @@ class Game:
         
         for instrument in self.instruments:
             instrument.update(now, self.dt, self.player)
+        
+        self.computer.update(now, self.dt, self.player)
 
     def display(self):
         # Dessiner l'image de fond
         self.screen.blit(self.background, (0, 0))
 
-        # Dessiner le instruments
+        # Dessiner les instruments
         for instrument in self.instruments:
             instrument.draw(self.screen, self.player)
+        
+        self.computer.draw(self.screen, self.player)
 
         # Dessiner le joueur
         self.player.draw(self.screen)
 
         # Dessiner l'interface
         for i, track in enumerate(self.tracks):
-            track.draw(self.screen, i)
+            track.draw(self.screen, i, i == self.selected_track)
 
         # for rect in self.collisions:
         #     pygame.draw.rect(self.screen, (255, 0, 0), rect)

@@ -22,5 +22,5 @@ class Instrument():
     def play(self):
         self.playing = True
     
-    def handle_input(self, event): # returns True when game is won, to add instrument to track
+    def handle_input(self, key): # returns True when game is won, to add instrument to track
         pass  # To be implemented in subclasses

@@ -41,7 +41,11 @@ class Guitar(Instrument):
             pygame.draw.rect(screen, (255, 255, 255), (self.rect.x - 36, self.rect.y - 36 - 25, 32*4 - 8, 12))
             pygame.draw.rect(screen, (0, 255, 0), (self.rect.x - 36, self.rect.y - 36 - 25, (32*4 - 8) * self.points / self.points_to_win, 12))
 
-    def handle_input(self, key_i):
+    def handle_input(self, key):
+        keys = [pygame.K_LEFT, pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT]
+        if not key in keys:
+            return False
+        key_i = keys.index(key)
         for arrow in self.arrows:
             if arrow[0] == key_i and 32*4 - 25 <= arrow[1] <= 32*4 - 5:
                 self.arrows.remove(arrow)
