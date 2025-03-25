@@ -16,11 +16,11 @@ class Instrument():
         self.last_arrow = 0.0
         self.arrows = [] # (arrow_i, arrow_y) ex. [(2, 15), (3, 10), (2, 12), ...]
         self.points = 0
-        self.points_to_win = 20
+        self.points_to_win = 15
 
-    def update(self, now, dt):
+    def update(self, now, dt, player):
         if self.playing:
-            if now - self.last_arrow >= 0.5:
+            if now - self.last_arrow >= randint(5, 10)/10:
                 self.last_arrow = now
                 self.arrows.append([randint(0, 3), 2*4])
 
@@ -32,6 +32,12 @@ class Instrument():
             
             if despawn_idx != -1:
                 self.arrows.pop(despawn_idx)
+                self.points -= 1
+                if self.points < 0:
+                    self.points = 0
+            
+            if not self.rect.colliderect(player.rect):
+                self.playing = False
     
     def draw(self, screen, player):
         if self.rect.colliderect(player.rect):
@@ -45,8 +51,9 @@ class Instrument():
                 screen.blit(self.arrows_img[arrow[0]], (self.rect.x - 40 + 3*4 + 7*4*arrow[0], self.rect.y - 40 + 32*4 - arrow[1]))
             
             # draw points as progress bar
-            pygame.draw.rect(screen, (255, 255, 255), (self.rect.x - 40, self.rect.y - 40 + 32*4 + 5, 32*4, 5))
-            pygame.draw.rect(screen, (0, 255, 0), (self.rect.x - 40, self.rect.y - 40 + 32*4 + 5, 32*4*self.points/self.points_to_win, 5))
+            pygame.draw.rect(screen, (0, 0, 0), (self.rect.x - 40, self.rect.y - 40 - 25, 32*4, 20)) # black border
+            pygame.draw.rect(screen, (255, 255, 255), (self.rect.x - 36, self.rect.y - 36 - 25, 32*4 - 8, 12)) # white background
+            pygame.draw.rect(screen, (0, 255, 0), (self.rect.x - 36, self.rect.y - 36 - 25, (32*4 - 8)*self.points/self.points_to_win, 12)) # green progress bar
 
     def play(self):
         self.playing = True
@@ -56,9 +63,19 @@ class Instrument():
     def arrow_key(self, key_i):
         # Check if the arrow is at the right y position
         for arrow in self.arrows:
-            if arrow[0] == key_i and 32*4 - 30 <= arrow[1] <= 32*4:
+            if arrow[0] != key_i:
+                continue
+
+            if 32*4 - 25 <= arrow[1] <= 32*4 - 5:
                 self.arrows.remove(arrow)
                 self.points += 1
-                break
+                if self.points >= self.points_to_win:
+                    self.playing = False
+                    self.points = 0
+                    return True
             else:
-                pass
+                self.points -= 1
+                if self.points < 0:
+                    self.points = 0
+            break
+        return False

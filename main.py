@@ -51,13 +51,14 @@ class Game:
                     self.player.dir = 'right'
                 elif event.key == pygame.K_SPACE:
                     for instrument in self.instruments:
-                        if self.player.rect.colliderect(instrument.rect) and len(self.tracks):
+                        if self.player.rect.colliderect(instrument.rect):
                             instrument.play()
-                            self.tracks[self.selected_track].add(instrument.name)
                 elif event.key in [pygame.K_LEFT, pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT]:
                     for instrument in self.instruments:
                         if instrument.playing:
-                            instrument.arrow_key([pygame.K_LEFT, pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT].index(event.key))
+                            win = instrument.arrow_key([pygame.K_LEFT, pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT].index(event.key))
+                            if win and len(self.tracks):
+                                self.tracks[self.selected_track].add(instrument.name)
                             break
 
         keys = pygame.key.get_pressed()
@@ -80,7 +81,7 @@ class Game:
         self.player.update(self.dt, self.collisions)
         
         for instrument in self.instruments:
-            instrument.update(now, self.dt)
+            instrument.update(now, self.dt, self.player)
 
     def display(self):
         # Dessiner l'image de fond
