@@ -49,11 +49,16 @@ class Game:
                     self.player.dir = 'left'
                 elif event.key == pygame.K_d:
                     self.player.dir = 'right'
-                if event.key == pygame.K_SPACE:
+                elif event.key == pygame.K_SPACE:
                     for instrument in self.instruments:
                         if self.player.rect.colliderect(instrument.rect) and len(self.tracks):
                             instrument.play()
                             self.tracks[self.selected_track].add(instrument.name)
+                elif event.key in [pygame.K_LEFT, pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT]:
+                    for instrument in self.instruments:
+                        if instrument.playing:
+                            instrument.arrow_key([pygame.K_LEFT, pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT].index(event.key))
+                            break
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
@@ -75,7 +80,7 @@ class Game:
         self.player.update(self.dt, self.collisions)
         
         for instrument in self.instruments:
-            instrument.update(now)
+            instrument.update(now, self.dt)
 
     def display(self):
         # Dessiner l'image de fond
