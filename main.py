@@ -38,6 +38,7 @@ class Game:
         # Pistes
         self.tracks = []
         self.selected_track = 0
+        self.max_instruments_per_track = 8
         
         for i in range(5):
             self.tracks.append(Track(["guitar", "bass", "drums", "piano"], "tyler"))
@@ -59,10 +60,10 @@ class Game:
                     for instrument in self.instruments:
                         if instrument.playing:
                             win = instrument.handle_input([pygame.K_LEFT, pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT].index(event.key))
-                            if win and len(self.tracks):
+                            if win and len(self.tracks) and len(self.tracks[self.selected_track].instruments) < self.max_instruments_per_track:
                                 self.tracks[self.selected_track].add(instrument.name)
                             break
-
+        # Player movement
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
             self.player.vel[1] = -1

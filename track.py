@@ -8,10 +8,11 @@ class Track():
         self.width = 200
         self.height = 100
         self.spacing = 5
-        self.instrument_slot_size = self.width//4 - self.spacing
-        self.instrument_slot_margin = 8
+        self.slots_per_line = 4
+        self.slot_size = self.width//self.slots_per_line - self.spacing
+        self.slot_margin = 8
 
-        icon_size = self.width//4 - self.instrument_slot_margin*2
+        icon_size = self.width//self.slots_per_line - self.slot_margin*2
 
         self.customer_img = resize_img(pygame.image.load(f"assets/images/customers/{customer}.png"), self.height//2)
         self.instruments_icons = [resize_img(pygame.image.load(f"assets/images/instruments/{instrument}.png"), icon_size, icon_size) for instrument in instrument_names]
@@ -28,8 +29,13 @@ class Track():
 
         # Icones des instruments
         for i, instrument in enumerate(self.instruments):
-            icon_x = x + (self.instrument_slot_size + self.spacing)*i
+            icon_x = x + (self.slot_size + self.spacing)*i
             icon_y = self.spacing*2 + self.height
-            pygame.draw.rect(screen, (180, 180, 180), (icon_x, icon_y, self.instrument_slot_size, self.instrument_slot_size)) # Bordure grise
-            pygame.draw.rect(screen, (255, 255, 255), (icon_x + 4, icon_y + 4, self.instrument_slot_size - 8, self.instrument_slot_size - 8)) # Fond blanc
-            screen.blit(self.instruments_icons[self.instrument_names.index(instrument)], (icon_x + self.instrument_slot_margin//2, icon_y + self.instrument_slot_margin//2)) # Icone
+
+            if i > self.slots_per_line - 1:
+                icon_x = x + (self.slot_size + self.spacing)*(i - self.slots_per_line)
+                icon_y += self.spacing + self.slot_size
+
+            pygame.draw.rect(screen, (180, 180, 180), (icon_x, icon_y, self.slot_size, self.slot_size)) # Bordure grise
+            pygame.draw.rect(screen, (255, 255, 255), (icon_x + 4, icon_y + 4, self.slot_size - 8, self.slot_size - 8)) # Fond blanc
+            screen.blit(self.instruments_icons[self.instrument_names.index(instrument)], (icon_x + self.slot_margin//2, icon_y + self.slot_margin//2)) # Icone
