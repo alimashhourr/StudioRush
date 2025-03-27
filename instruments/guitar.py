@@ -15,7 +15,7 @@ class Guitar(Instrument):
         self.next_arrow_interval = 0
         self.arrows = []
         self.points = 0
-        self.points_to_win = 10
+        self.points_to_win = 8
 
     def play(self):
         if not self.playing:

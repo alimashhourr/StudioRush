@@ -18,6 +18,10 @@ class Drums(Instrument):
         self.current_cursor = 0
 
         self.just_started = False
+
+        self.sound = [pygame.mixer.Sound(f"assets/sound/instruments/drums/drums{i}.mp3") for i in range(3)]
+        for i in range(3):
+            self.sound[i].set_volume(0.8)
     
     def play(self):
         if not self.playing:
@@ -56,6 +60,7 @@ class Drums(Instrument):
                 return False
             
             if 270-12 < (self.cursors_angle[self.current_cursor] % 360) < 270+12:
+                self.sound[self.current_cursor].play()
                 self.current_cursor += 1
                 if self.current_cursor == 3:
                     self.playing = False

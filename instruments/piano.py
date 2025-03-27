@@ -6,20 +6,20 @@ from instrument import Instrument
 class Piano(Instrument):
     def __init__(self, x, y):
         super().__init__("piano", x, y)
-        key = ["do", "re", "mi", "fa", "sol", "la", "ti", "doo"]	
         self.window = resize_img(pygame.image.load("assets/images/ui/piano_window.png"), width=32*4)
-        self.sound = {}
-        for i in range(8):
-            self.sound[key[i]] = pygame.mixer.Sound(f"assets/sound/instruments/piano/{key[i]}.mp3")
-            self.sound[key[i]].set_volume(0.8)
         self.tiles_img = [resize_img(pygame.image.load(f"assets/images/ui/tile{i}.png"), width=5*4) for i in range(2)]
-        self.melody = ["mi", "fa", "sol", "la", "ti", "do", "re", "mi", "fa", "sol", "la", "ti", "do", "re", "mi"]
         self.keynum = 0
         self.last_tile = 0
         self.next_tile_interval = 0
         self.tiles = []
         self.points = 0
-        self.points_to_win = 10
+        self.points_to_win = 8
+
+        # Sons
+        keys = ["do", "re", "mi", "fa", "sol", "la", "ti", "doo"]
+        self.sound = [pygame.mixer.Sound(f"assets/sound/instruments/piano/{keys[i]}.mp3") for i in range(len(keys))]
+        for i in range(len(keys)):
+            self.sound[i].set_volume(0.8)
 
     def play(self):
         if not self.playing:
@@ -66,9 +66,9 @@ class Piano(Instrument):
             if tile[0] == key_i and 32*4 - 75 <= tile[1] <= 32*4 + 20:
                 self.tiles.remove(tile)
                 self.points += 1
-                self.sound[self.melody[self.keynum]].play()
+                self.sound[self.keynum].play()
                 self.keynum += 1
-                if self.keynum >= len(self.melody):
+                if self.keynum >= len(self.sound):
                     self.keynum = 0
                 if self.points >= self.points_to_win:
                     self.playing = False

@@ -204,7 +204,7 @@ class Game:
         while name in [customer.name for customer in self.customers]:
             name = random.choice(self.customer_names)
 
-        self.customers.append(Customer(name, self.instrument_names, 1430, 900-100*len(self.customers), self.now))
+        self.customers.append(Customer(name, self.instrument_names, 1430, 300+100*len(self.customers), self.now))
         self.tracks.append(Track(self.instrument_names, name))
 
 pygame.init()

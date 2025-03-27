@@ -5,9 +5,9 @@ class Track():
     def __init__(self, instrument_names, customer):
         self.instruments = []
         self.instrument_names = instrument_names
-        self.width = 200
-        self.height = 100
-        self.spacing = 8
+        self.width = 250
+        self.height = 160
+        self.spacing = 10
         self.slots_per_line = 4
         self.slots_spacing = 4
         self.slot_size = self.width//self.slots_per_line - self.slots_spacing
@@ -18,7 +18,7 @@ class Track():
 
         icon_size = self.width//self.slots_per_line - self.slot_padding*2
 
-        self.customer_img = resize_img(pygame.image.load(f"assets/images/customers/{customer}.png"), self.height//2)
+        self.customer_img = resize_img(pygame.image.load(f"assets/images/customers/{customer}.png"), 75)
         self.instruments_icons = [resize_img(pygame.image.load(f"assets/images/instruments/{instrument}.png"), icon_size, icon_size) for instrument in instrument_names]
     
     def add(self, instrument):
@@ -34,7 +34,7 @@ class Track():
     def draw(self, screen, idx, selected, now):
         x = 100 + (self.width + self.spacing)*idx
         if selected:
-            pygame.draw.rect(screen, (0, 0, 0), (x - 6, self.spacing - 6, self.width + 12, self.height + 12))
+            pygame.draw.rect(screen, (0, 0, 0), (x - 8, self.spacing - 8, self.width + 16, self.height + 16))
         pygame.draw.rect(screen, (255, 255, 255), (x, self.spacing, self.width, self.height))
         pygame.draw.rect(screen, (180, 180, 180), (x, self.spacing, self.width, self.height//3))
         
