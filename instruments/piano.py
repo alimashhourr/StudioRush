@@ -34,7 +34,7 @@ class Piano(Instrument):
             if now - self.last_tile >= self.next_tile_interval:
                 self.last_tile = now
                 self.tiles.append([randint(0, 3), 2*4, randint(0, 1)])
-                self.next_tile_interval = randint(8, 12) / 10
+                self.next_tile_interval = randint(5, 10) / 10
 
             despawn_idx = -1
             for i, tile in enumerate(self.tiles):

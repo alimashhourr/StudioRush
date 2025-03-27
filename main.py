@@ -21,12 +21,15 @@ class Game:
         self.now = 0
         self.FPS = 30
         self.running = True
-        self.score = 0
 
         self.playing = False
-        self.menu = MainMenu()
+        self.score = 0
+        self.timer = 0
+        self.gameover = False
+        self.gameover_time = 0
         
         # Interface
+        self.menu = MainMenu()
         self.ui = UserInterface()
         
         # Charger le fond
@@ -67,17 +70,44 @@ class Game:
         self.free_customers_pos = [True]*self.max_customers
         self.last_customer = 0
         self.next_customer_interval = 5
+        self.served_clients = 0
 
         # Music
         pygame.mixer.music.load('assets/sound/soundtrack.mp3')
         pygame.mixer.music.set_volume(0.2)
         pygame.mixer.music.play(-1)
+    
+    def start_game(self, players, game_type):
+        self.score = 0
+        self.served_clients = 0
+        self.tracks = []
+        self.selected_track = 0
+        self.customers = []
+        self.free_customers_pos = [True]*self.max_customers
+        self.next_customer_interval = 5
+        
+        if game_type == 1:
+            self.timer = 60*3 + 1
+        else:
+            self.timer = 60*6 + 1
+        self.playing = True
 
     def handling_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-            elif event.type == pygame.KEYDOWN:
+            if not self.playing:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    start = self.menu.click()
+                    if start:
+                        self.start_game(self.menu.players, self.menu.game_type)
+                return
+            
+            if self.gameover:
+                return
+            
+            # Touches pour jouer
+            if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_a:
                     self.player.dir = 'left'
                 elif event.key == pygame.K_d:
@@ -142,10 +172,19 @@ class Game:
         if not self.playing:
             self.menu.update()
             return
+        
+        if self.gameover:
+            if self.now - self.gameover_time >= 5:
+                self.gameover = False
+                self.playing = False
+            return
 
         self.timer -= self.dt
+
         if self.timer <= 0:
-            self.running = False  # Stop
+            self.timer = 0
+            self.gameover = True  # Stop
+            self.gameover_time = self.now
         
         self.player.update(self.dt, self.collisions)
         
@@ -163,6 +202,7 @@ class Game:
             # Vérifier si la piste est la bonne
             if self.customers[despawn_idx].is_right_track(self.tracks[despawn_idx].instruments):
                 self.score += self.customers[despawn_idx].points
+                self.served_clients += 1
             self.remove_customer(despawn_idx)
             
 
@@ -182,7 +222,6 @@ class Game:
     def display(self):
         if not self.playing:
             self.menu.draw_menu(self.screen)
-            self.menu.draw_buttons(self.screen)
             pygame.display.flip()
             return
         
@@ -206,7 +245,7 @@ class Game:
         for i, track in enumerate(self.tracks):
             track.draw(self.screen, i, i == self.selected_track, self.now)
         
-        self.ui.draw(self.screen, self.score, self.timer)
+        self.ui.draw(self.screen, self.score, self.timer, self.gameover, self.served_clients)
 
         # for rect in self.collisions:
         #     pygame.draw.rect(self.screen, (255, 0, 0), rect)

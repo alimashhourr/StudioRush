@@ -36,7 +36,7 @@ class Drums(Instrument):
         if self.playing:
             for i in range(3):
                 if i == self.current_cursor:
-                    self.cursors_angle[i] += 360 * dt # 1 tour par seconde
+                    self.cursors_angle[i] += 300 * dt
 
     def draw(self, screen, player):
         super().draw(screen, player)
@@ -59,7 +59,7 @@ class Drums(Instrument):
                 self.just_started = False
                 return False
             
-            if 270-12 < (self.cursors_angle[self.current_cursor] % 360) < 270+12:
+            if 270-16 < (self.cursors_angle[self.current_cursor] % 360) < 270+16:
                 self.sound[self.current_cursor].play()
                 self.current_cursor += 1
                 if self.current_cursor == 3:
