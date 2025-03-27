@@ -7,6 +7,8 @@ class Font:
         self.font = {}
         for file_name in listdir(dir):
             char = file_name[0]
+            if file_name == "semicolon.png":
+                char = ':'
             img = pygame.image.load(dir + '/' + file_name)
             img = resize_img(img, height=size)
             self.font[char] = img

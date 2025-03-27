@@ -5,8 +5,8 @@ from utils import resize_img
 from player import Player
 from track import Track
 from customer import Customer
-from font import Font
 from track import Track
+from ui import UserInterface
 from instrument import Instrument
 from instruments.guitar import Guitar
 from instruments.drums import Drums
@@ -21,8 +21,10 @@ class Game:
         self.FPS = 30
         self.running = True
         self.score = 0
+        self.timer = 60*5
         
-        self.font = Font('assets/images/font', 60)
+        # Interface
+        self.ui = UserInterface()
         
         # Charger le fond
         self.background = resize_img(pygame.image.load("assets/images/studio.png"), width=screen.get_width())
@@ -134,6 +136,10 @@ class Game:
                 self.selected_track = 0
 
     def update(self):
+        self.timer -= self.dt
+        if self.timer <= 0:
+            self.running = False  # Stop
+        
         self.player.update(self.dt, self.collisions)
         
         for instrument in self.instruments:
@@ -186,8 +192,8 @@ class Game:
         # Dessiner l'interface
         for i, track in enumerate(self.tracks):
             track.draw(self.screen, i, i == self.selected_track, self.now)
-            
-        self.font.display(screen, str(self.score), 100, 1000, 2)
+        
+        self.ui.draw(self.screen, self.score, self.timer)
 
         # for rect in self.collisions:
         #     pygame.draw.rect(self.screen, (255, 0, 0), rect)
