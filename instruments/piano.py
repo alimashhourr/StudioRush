@@ -20,6 +20,13 @@ class Piano(Instrument):
         self.points = 0
         self.points_to_win = 10
 
+    def play(self):
+        if not self.playing:
+            # Reset le pointage
+            self.points = 0
+            self.tiles = []
+        super().play()
+
     def update(self, now, dt, player):
         super().update(now, dt, player)
         if self.playing:
@@ -64,7 +71,6 @@ class Piano(Instrument):
                     self.keynum = 0
                 if self.points >= self.points_to_win:
                     self.playing = False
-                    self.points = 0
                     return True
             else:
                 self.points = max(0, self.points - 1)

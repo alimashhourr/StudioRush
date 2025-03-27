@@ -8,8 +8,9 @@ class Guitar(Instrument):
         super().__init__("guitar", x, y)
         self.window = resize_img(pygame.image.load("assets/images/ui/guitar_window.png"), width=32*4)
         self.arrows_img = [resize_img(pygame.image.load(f"assets/images/ui/arrow{i}.png"), width=5*4) for i in range(4)]
-        self.sound = [pygame.mixer.Sound(f"assets/sound/instruments/guitar/Guitar_Chord_{i}.mp3") for i in range(1,3)]
+        self.sound = [pygame.mixer.Sound(f"assets/sound/instruments/guitar/guitar{i}.mp3") for i in range(4)]
         self.last_arrow = 0
+        self.next_arrow_interval = 0
         self.arrows = []
         self.points = 0
         self.points_to_win = 10
@@ -24,9 +25,10 @@ class Guitar(Instrument):
     def update(self, now, dt, player):
         super().update(now, dt, player)
         if self.playing:
-            if now - self.last_arrow >= randint(5, 10) / 10:
+            if now - self.last_arrow >= self.next_arrow_interval:
                 self.last_arrow = now
                 self.arrows.append([randint(0, 3), 2*4])
+                self.next_arrow_interval = randint(3, 8) / 10
 
             despawn_idx = -1
             for i, arrow in enumerate(self.arrows):
@@ -55,10 +57,10 @@ class Guitar(Instrument):
             return False
         key_i = keys.index(key)
         for arrow in self.arrows:
-            if arrow[0] == key_i and 32*4 - 25 <= arrow[1] <= 32*4 - 5:
+            if arrow[0] == key_i and 32*4 - 30 <= arrow[1] <= 32*4 + 10:
                 self.arrows.remove(arrow)
                 self.points += 1
-                self.sound[randint(0, 1)].play()
+                self.sound[arrow[0]].play()
                 if self.points >= self.points_to_win:
                     self.playing = False
                     return True
