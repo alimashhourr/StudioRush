@@ -3,11 +3,12 @@ import random
 
 from utils import resize_img
 from player import Player
-from instrument import Instrument
-from instruments.guitar import Guitar
-from track import Track
 from customer import Customer
 from font import Font
+from track import Track
+from instrument import Instrument
+from instruments.guitar import Guitar
+from instruments.drums import Drums
 
 class Game:
     def __init__(self, screen: pygame.Surface):
@@ -32,7 +33,7 @@ class Game:
         self.instruments = [
             Guitar(374, 772),
             Instrument("bass", 805, 375),
-            Instrument("drums", 727, 750),
+            Drums(727, 750),
             Instrument("piano", 479, 440),
         ]
 
@@ -68,7 +69,6 @@ class Game:
                     for instrument in self.instruments:
                         if self.player.rect.colliderect(instrument.rect):
                             instrument.play()
-                            self.tracks[self.selected_track].add(instrument.name)
                 
                 elif event.key == pygame.K_c: # TESTING
                     self.spawn_customer()
