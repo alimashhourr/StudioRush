@@ -8,6 +8,7 @@ class Guitar(Instrument):
         super().__init__("guitar", x, y)
         self.window = resize_img(pygame.image.load("assets/images/ui/guitar_window.png"), width=32*4)
         self.arrows_img = [resize_img(pygame.image.load(f"assets/images/ui/arrow{i}.png"), width=5*4) for i in range(4)]
+        self.sound = [pygame.mixer.Sound(f"assets/sound/instruments/guitar/Guitar_Chord_{i}.mp3") for i in range(1,3)]
         self.last_arrow = 0
         self.arrows = []
         self.points = 0
@@ -50,6 +51,7 @@ class Guitar(Instrument):
             if arrow[0] == key_i and 32*4 - 25 <= arrow[1] <= 32*4 - 5:
                 self.arrows.remove(arrow)
                 self.points += 1
+                self.sound[randint(0, 1)].play()
                 if self.points >= self.points_to_win:
                     self.playing = False
                     self.points = 0

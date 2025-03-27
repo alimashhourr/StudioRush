@@ -5,6 +5,7 @@ from utils import resize_img
 from player import Player
 from instrument import Instrument
 from instruments.guitar import Guitar
+from instruments.piano import Piano
 from track import Track
 from customer import Customer
 from font import Font
@@ -23,7 +24,7 @@ class Game:
         
         # Charger le fond
         self.background = resize_img(pygame.image.load("assets/images/studio.png"), width=screen.get_width())
-
+        
         # Objet joueur
         self.player = Player(280, 600, self.screen.get_width(), self.screen.get_height())
 
@@ -33,7 +34,7 @@ class Game:
             Guitar(374, 772),
             Instrument("bass", 805, 375),
             Instrument("drums", 727, 750),
-            Instrument("piano", 479, 440),
+            Piano(479, 440),
         ]
 
         self.computer = Instrument("computer", 1191, 374)
