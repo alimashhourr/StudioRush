@@ -57,6 +57,9 @@ class Game:
         # Clients
         self.customer_names = ["tyler", "drake", "cardib", "travis", "lilwayne", "jcole", "eminem", "xxxtentacion"]
         self.customers = []
+        self.max_customers = 7
+        self.customers_pos = [300+100*i for i in range(self.max_customers)]
+        self.free_customers_pos = [True]*self.max_customers
         self.last_customer = 0
         self.next_customer_interval = 5
 
@@ -121,6 +124,7 @@ class Game:
             self.player.vel[0] = 0
     
     def remove_customer(self, idx):
+        self.free_customers_pos[self.customers_pos.index(self.customers[idx].rect.y)] = True
         self.customers.pop(idx)
         self.tracks.pop(idx)
         
@@ -200,11 +204,16 @@ class Game:
             self.dt = self.clock.tick(self.FPS) / 1000
     
     def spawn_customer(self):
+        if len(self.customers) > self.max_customers:
+            return
+        
         name = random.choice(self.customer_names)
         while name in [customer.name for customer in self.customers]:
             name = random.choice(self.customer_names)
-
-        self.customers.append(Customer(name, self.instrument_names, 1430, 300+100*len(self.customers), self.now))
+        
+        pos = self.free_customers_pos.index(True)
+        self.free_customers_pos[pos] = False
+        self.customers.append(Customer(name, self.instrument_names, 1430, self.customers_pos[pos], self.now))
         self.tracks.append(Track(self.instrument_names, name))
 
 pygame.init()

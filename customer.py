@@ -59,7 +59,7 @@ class Customer:
         for instrument in self.track:
             my_instruments_count[instrument] += 1
         
-        return sent_instruments_count == my_instruments_tracks
+        return sent_instruments_count == my_instruments_count
             
 
     def draw(self, screen, now):

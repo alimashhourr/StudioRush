@@ -53,6 +53,6 @@ class Track():
                 icon_x = x + (self.slot_size + self.slots_spacing)*(i - self.slots_per_line)
                 icon_y += self.slots_spacing + self.slot_size
 
-            pygame.draw.rect(screen, (180, 180, 180), (icon_x, icon_y, self.slot_size, self.slot_size)) # Bordure grise
+            pygame.draw.rect(screen, (0, 0, 0), (icon_x, icon_y, self.slot_size, self.slot_size)) # Bordure grise
             pygame.draw.rect(screen, (255, 255, 255), (icon_x + 4, icon_y + 4, self.slot_size - 8, self.slot_size - 8)) # Fond blanc
             screen.blit(self.instruments_icons[self.instrument_names.index(instrument)], (icon_x + self.slot_padding//2, icon_y + self.slot_padding//2)) # Icone
