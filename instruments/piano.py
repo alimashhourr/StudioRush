@@ -11,6 +11,7 @@ class Piano(Instrument):
         self.sound = {}
         for i in range(8):
             self.sound[key[i]] = pygame.mixer.Sound(f"assets/sound/instruments/piano/{key[i]}.mp3")
+            self.sound[key[i]].set_volume(0.8)
         self.tiles_img = [resize_img(pygame.image.load(f"assets/images/ui/tile{i}.png"), width=5*4) for i in range(2)]
         self.melody = ["mi", "fa", "sol", "la", "ti", "do", "re", "mi", "fa", "sol", "la", "ti", "do", "re", "mi"]
         self.keynum = 0

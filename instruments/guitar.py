@@ -9,6 +9,8 @@ class Guitar(Instrument):
         self.window = resize_img(pygame.image.load("assets/images/ui/guitar_window.png"), width=32*4)
         self.arrows_img = [resize_img(pygame.image.load(f"assets/images/ui/arrow{i}.png"), width=5*4) for i in range(4)]
         self.sound = [pygame.mixer.Sound(f"assets/sound/instruments/guitar/guitar{i}.mp3") for i in range(4)]
+        for i in range(4):
+            self.sound[i].set_volume(0.2)
         self.last_arrow = 0
         self.next_arrow_interval = 0
         self.arrows = []
@@ -28,7 +30,7 @@ class Guitar(Instrument):
             if now - self.last_arrow >= self.next_arrow_interval:
                 self.last_arrow = now
                 self.arrows.append([randint(0, 3), 2*4])
-                self.next_arrow_interval = randint(3, 8) / 10
+                self.next_arrow_interval = randint(4, 9) / 10
 
             despawn_idx = -1
             for i, arrow in enumerate(self.arrows):

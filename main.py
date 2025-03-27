@@ -8,7 +8,6 @@ from customer import Customer
 from font import Font
 from track import Track
 from instrument import Instrument
-
 from instruments.guitar import Guitar
 from instruments.drums import Drums
 from instruments.piano import Piano
@@ -58,6 +57,13 @@ class Game:
         # Clients
         self.customer_names = ["tyler", "drake", "cardib", "travis", "lilwayne", "jcole", "eminem", "xxxtentacion"]
         self.customers = []
+        self.last_customer = 0
+        self.next_customer_interval = 5
+
+        # Music
+        pygame.mixer.music.load('assets/sound/soundtrack.mp3')
+        pygame.mixer.music.set_volume(0.2)
+        pygame.mixer.music.play(-1)
 
     def handling_events(self):
         for event in pygame.event.get():
@@ -122,7 +128,6 @@ class Game:
             self.selected_track -= 1
             if self.selected_track < 0:
                 self.selected_track = 0
-        
 
     def update(self):
         self.player.update(self.dt, self.collisions)
@@ -151,6 +156,11 @@ class Game:
         
         if despawn_idx != -1:
             self.remove_customer(despawn_idx)
+        
+        if self.now - self.last_customer >= self.next_customer_interval:
+            self.spawn_customer()
+            self.last_customer = self.now
+            self.next_customer_interval = random.randint(15, 30)
         
     def display(self):
         # Dessiner l'image de fond
@@ -194,7 +204,7 @@ class Game:
         while name in [customer.name for customer in self.customers]:
             name = random.choice(self.customer_names)
 
-        self.customers.append(Customer(name, self.instrument_names, 1430, 800-100*len(self.customers), self.now))
+        self.customers.append(Customer(name, self.instrument_names, 1430, 900-100*len(self.customers), self.now))
         self.tracks.append(Track(self.instrument_names, name))
 
 pygame.init()
