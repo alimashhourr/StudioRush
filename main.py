@@ -11,6 +11,7 @@ from instrument import Instrument
 from instruments.guitar import Guitar
 from instruments.drums import Drums
 from instruments.piano import Piano
+from mainmenu import MainMenu
 
 class Game:
     def __init__(self, screen: pygame.Surface):
@@ -21,6 +22,9 @@ class Game:
         self.FPS = 30
         self.running = True
         self.score = 0
+
+        self.playing = False
+        self.menu = MainMenu()
         
         self.font = Font('assets/images/font', 60)
         
@@ -134,6 +138,10 @@ class Game:
                 self.selected_track = 0
 
     def update(self):
+        if not self.playing:
+            self.menu.update()
+            return
+
         self.player.update(self.dt, self.collisions)
         
         for instrument in self.instruments:
@@ -167,6 +175,12 @@ class Game:
             self.next_customer_interval = random.randint(15, 30)
         
     def display(self):
+        if not self.playing:
+            self.menu.draw_menu(self.screen)
+            self.menu.draw_buttons(self.screen)
+            pygame.display.flip()
+            return
+        
         # Dessiner l'image de fond
         self.screen.blit(self.background, (0, 0))
 
