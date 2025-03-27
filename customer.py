@@ -6,11 +6,10 @@ class Customer:
     def __init__(self, name, instrument_names, x, y, now):
         self.name = name
         self.instrument_names = instrument_names
-        track_length = random.choices([1, 2, 3, 4, 5, 6, 7, 8], weights=[0.1, 0.2, 0.3, 0.2, 0.05, 0.05, 0.05, 0.05], k=1)[0]
-        self.track = random.choices(instrument_names, k=track_length)
-        self.time = track_length*30 + 30
+        self.track = self.generate_track(instrument_names.copy())
+        self.time = len(self.track)*30 + 30
         self.start_time = now
-        self.points = track_length*50
+        self.points = len(self.track)*10
 
         self.img = resize_img(pygame.image.load(f"assets/images/customers/{name}.png"), height=80)
         self.rect = self.img.get_rect(x=x, y=y)
@@ -23,6 +22,24 @@ class Customer:
 
         self.instruments_icons = [resize_img(pygame.image.load(f"assets/images/instruments/{instrument}.png"), self.icon_size, self.icon_size) for instrument in instrument_names]
     
+    def generate_track(self, instrument_names):
+        track_length = random.choices([1, 2, 3, 4, 5, 6, 7, 8], weights=[0.1, 0.2, 0.3, 0.2, 0.05, 0.05, 0.05, 0.05], k=1)[0]
+        track = random.choices(instrument_names, k=track_length)
+        
+        # Trier la piste en regroupant les instruments
+        random.shuffle(instrument_names)
+        instruments_count = {}
+        for instrument in instrument_names:
+            instruments_count[instrument] = 0
+        for instrument in track:
+            instruments_count[instrument] += 1
+        sorted_track = []
+        for instrument in instruments_count.keys():
+            for i in range(instruments_count[instrument]):
+                sorted_track.append(instrument)
+            
+        return sorted_track
+        
     def update(self, now):
         time_left = self.time - (now - self.start_time)
         if time_left <= 0:
@@ -31,16 +48,16 @@ class Customer:
 
     def is_right_track(self, sent_track):
         sent_instruments_count = {}
-        my_instruments_tracks = {}
+        my_instruments_count = {}
         for instrument in self.instrument_names:
             sent_instruments_count[instrument] = 0
-            my_instruments_tracks[instrument] = 0
+            my_instruments_count[instrument] = 0
         
         for instrument in sent_track:
             sent_instruments_count[instrument] += 1
         
         for instrument in self.track:
-            my_instruments_tracks[instrument] += 1
+            my_instruments_count[instrument] += 1
         
         return sent_instruments_count == my_instruments_tracks
             
