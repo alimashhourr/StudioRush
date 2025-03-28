@@ -70,13 +70,31 @@ class Game:
         self.customers_pos = [300+100*i for i in range(self.max_customers)]
         self.free_customers_pos = [True]*self.max_customers
         self.last_customer = 0
-        self.next_customer_interval = 3
+        self.next_customer_interval = 0
         self.served_clients = 0
 
-        # Music
+        # Musique
         pygame.mixer.music.load('assets/sound/soundtrack.mp3')
-        pygame.mixer.music.set_volume(0.2)
+        pygame.mixer.music.set_volume(0.15)
         pygame.mixer.music.play(-1)
+
+        # Sons
+        self.sounds = {
+            "points": pygame.mixer.Sound("assets/sound/cash.mp3"),
+            "fail": pygame.mixer.Sound("assets/sound/fail.mp3"),
+            "switch": pygame.mixer.Sound("assets/sound/switch.mp3"),
+            "reset": pygame.mixer.Sound("assets/sound/reset.mp3"),
+            "send": pygame.mixer.Sound("assets/sound/send.mp3"),
+            "10s": pygame.mixer.Sound("assets/sound/clock_ticking_10s.mp3"),
+            "gameover": pygame.mixer.Sound("assets/sound/gong.mp3")
+        }
+        self.played_ticking = False
+
+        self.sounds["points"].set_volume(3)
+        self.sounds["fail"].set_volume(0.5)
+        self.sounds["switch"].set_volume(2)
+        self.sounds["reset"].set_volume(1.5)
+        self.sounds["send"].set_volume(1.5)
     
     def start_game(self, players, game_type):
         self.score = 0
@@ -87,6 +105,7 @@ class Game:
         self.free_customers_pos = [True]*self.max_customers
         self.last_customer = self.now
         self.next_customer_interval = 3
+        self.played_ticking = False
         
         if game_type == 1:
             self.timer = 60*3 + 1
@@ -133,16 +152,23 @@ class Game:
                 # Computer input
                 if self.player.rect.colliderect(self.computer.rect):
                     if event.key == pygame.K_RIGHT:
+                        self.sounds["switch"].play()
                         self.selected_track += 1
                         if self.selected_track >= len(self.tracks):
                             self.selected_track = 0
                     elif event.key == pygame.K_LEFT:
+                        self.sounds["switch"].play()
                         self.selected_track -= 1
                         if self.selected_track < 0:
                             self.selected_track = len(self.tracks) - 1
                     elif event.key == pygame.K_RETURN:
+                        self.sounds["send"].play()
                         if len(self.tracks) and not self.tracks[self.selected_track].sending:
                             self.tracks[self.selected_track].send(self.now)
+                    elif event.key == pygame.K_r:
+                        if len(self.tracks) and not self.tracks[self.selected_track].sending:
+                            self.tracks[self.selected_track].reset()
+                            self.sounds["reset"].play()
 
         # Player movement
         keys = pygame.key.get_pressed()
@@ -176,17 +202,24 @@ class Game:
             return
         
         if self.gameover:
-            if self.now - self.gameover_time >= 5:
+            if self.now - self.gameover_time >= 8:
+                # Retourner au menu
                 self.gameover = False
                 self.playing = False
+                pygame.mixer.music.play(-1)
             return
 
         self.timer -= self.dt
 
+        if self.timer <= 10 and not self.played_ticking:
+            self.sounds["10s"].play()
+            self.played_ticking = True
         if self.timer <= 0:
             self.timer = 0
             self.gameover = True  # Stop
             self.gameover_time = self.now
+            pygame.mixer.music.stop()
+            self.sounds["gameover"].play()
         
         self.player.update(self.dt, self.collisions)
         
@@ -205,6 +238,9 @@ class Game:
             if self.customers[despawn_idx].is_right_track(self.tracks[despawn_idx].instruments):
                 self.score += self.customers[despawn_idx].points
                 self.served_clients += 1
+                self.sounds["points"].play()
+            else:
+                self.sounds["fail"].play()
             self.remove_customer(despawn_idx)
             
 
@@ -215,11 +251,12 @@ class Game:
         
         if despawn_idx != -1:
             self.remove_customer(despawn_idx)
+            self.sounds["fail"].play()
         
         if self.now - self.last_customer >= self.next_customer_interval:
             self.spawn_customer()
             self.last_customer = self.now
-            self.next_customer_interval = random.randint(15, 30)
+            self.next_customer_interval = random.randint(13, 20)
         
     def display(self):
         if not self.playing:
@@ -269,7 +306,7 @@ class Game:
             self.dt = self.clock.tick(self.FPS) / 1000
     
     def spawn_customer(self):
-        if len(self.customers) > self.max_customers:
+        if len(self.customers) == self.max_customers:
             return
         
         name = random.choice(self.customer_names)

@@ -13,7 +13,7 @@ class Piano(Instrument):
         self.next_tile_interval = 0
         self.tiles = []
         self.points = 0
-        self.points_to_win = 8
+        self.points_to_win = 6
 
         # Sons
         keys = ["do", "re", "mi", "fa", "sol", "la", "ti", "doo"]

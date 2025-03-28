@@ -24,6 +24,9 @@ class Track():
     def add(self, instrument):
         self.instruments.append(instrument)
     
+    def reset(self):
+        self.instruments = []
+    
     def send(self, now):
         self.sending = True
         self.send_time = now

@@ -16,7 +16,7 @@ class Player():
         self.hitbox = pygame.Rect(0, 0, self.rect.width*0.8, self.rect.height/4) # Seuls les pieds du joueur sont en collision avec les tiles
         self.hitbox.midbottom = self.rect.midbottom
         
-        self.speed = 200
+        self.speed = 250
         self.vel = [0, 0]
         self.is_moving = False
 

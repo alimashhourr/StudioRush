@@ -8,7 +8,7 @@ class Customer:
         self.name = name
         self.instrument_names = instrument_names
         self.track = self.generate_track(instrument_names.copy())
-        self.time = len(self.track)*30 + 30
+        self.time = 50 + len(self.track)*20
         self.points = len(self.track)*10
 
         self.img = resize_img(pygame.image.load(f"assets/images/customers/{name}.png"), height=80)
@@ -23,6 +23,9 @@ class Customer:
 
         self.instruments_icons = [resize_img(pygame.image.load(f"assets/images/instruments/{instrument}.png"), self.icon_size, self.icon_size) for instrument in instrument_names]
 
+        # Son
+        self.ding = pygame.mixer.Sound("assets/sound/ding.mp3")
+
         # VOITURE
         self.car = resize_img(pygame.image.load(f"assets/images/cars/car{randint(0,6)}.png"), width=80)
         self.car_rect = self.car.get_rect(x=1555, y=1080)
@@ -31,7 +34,7 @@ class Customer:
         self.car_left = False
     
     def generate_track(self, instrument_names):
-        track_length = random.choices([1, 2, 3, 4, 5, 6, 7, 8], weights=[0.1, 0.2, 0.3, 0.2, 0.05, 0.05, 0.05, 0.05], k=1)[0]
+        track_length = random.choices([1, 2, 3, 4, 5, 6], weights=[0.2, 0.2, 0.2, 0.2, 0.1, 0.1], k=1)[0]
         track = random.choices(instrument_names, k=track_length)
         
         # Trier la piste en regroupant les instruments
@@ -62,6 +65,7 @@ class Customer:
                     self.car_arrived = True
                     self.car_arrived_time = now
                     self.start_time = now
+                    self.ding.play()
 
         if self.car_arrived:
             time_left = self.time - (now - self.start_time)
