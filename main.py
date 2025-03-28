@@ -86,6 +86,8 @@ class Game:
         self.customers = []
         self.free_customers_pos = [True]*self.max_customers
         self.next_customer_interval = 5
+        self.last_customer = self.now
+        self.next_customer_interval = 5
         
         if game_type == 1:
             self.timer = 60*3 + 1

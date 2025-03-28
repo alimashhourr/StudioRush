@@ -1,6 +1,5 @@
 import pygame
 from utils import resize_img
-from random import randint
 from instrument import Instrument
 import math
 
@@ -34,15 +33,13 @@ class Drums(Instrument):
     def update(self, now, dt, player):
         super().update(now, dt, player)
         if self.playing:
-            for i in range(3):
-                if i == self.current_cursor:
-                    self.cursors_angle[i] += 300 * dt
+            self.cursors_angle[self.current_cursor] += 300 * dt
 
     def draw(self, screen, player):
         super().draw(screen, player)
         if self.playing:
             for i, angle in enumerate(self.cursors_angle):
-                circle_x = self.rect.x + 80*i
+                circle_x = self.rect.x + 50 + 80*i
                 circle_y = self.rect.y - 50
                 screen.blit(self.circle_img, (circle_x, circle_y))
 
