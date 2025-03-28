@@ -30,10 +30,10 @@ class Bass(Instrument):
             self.just_started = True
         super().play()
 
-    def update(self, now, dt, player):
-        super().update(now, dt, player)
+    def update(self, now, dt):
+        super().update(now, dt)
         if self.playing:
-            self.cursors_pos[self.current_cursor] += 160 * dt * self.cursor_dir
+            self.cursors_pos[self.current_cursor] += 120 * dt * self.cursor_dir
             if self.cursors_pos[self.current_cursor] > self.lines_width - self.cursor_width:
                 self.cursors_pos[self.current_cursor] = self.lines_width - self.cursor_width
                 self.cursor_dir *= -1
@@ -47,18 +47,20 @@ class Bass(Instrument):
             pygame.draw.rect(screen, (165, 165, 165), (self.lines_x + self.lines_width//2 - self.cursor_width//2, self.lines_y + i*self.lines_spacing, self.cursor_width, self.lines_height))
             pygame.draw.rect(screen, (77, 77, 77), (self.lines_x + pos, self.lines_y + i*self.lines_spacing, self.cursor_width, self.lines_height))
 
-    def handle_input(self, key):
-        if key == pygame.K_SPACE:
-            if self.just_started: # La barre espace est pressée pour lancer le jeu
+    def handle_input(self, key, player):
+        if key == player.keybinds['up']:
+            if self.just_started: # La touche est pressée pour lancer le jeu
                 self.just_started = False
                 return False
             
-            if self.lines_width//2 - self.cursor_width//2 - 3 < (self.cursors_pos[self.current_cursor]) < self.lines_width//2 + self.cursor_width//2 + 3:
+            if self.lines_width//2 - self.cursor_width//2 - 6 < (self.cursors_pos[self.current_cursor]) < self.lines_width//2 + self.cursor_width//2 + 6:
                 self.sound[self.current_cursor].play()
                 self.current_cursor += 1
                 if self.current_cursor >= 4:
                     self.playing = False
+                    player.playing = False
                     return True
             else:
                 self.playing = False
+                player.playing = False
         return False

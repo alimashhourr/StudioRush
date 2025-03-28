@@ -4,12 +4,16 @@ from utils import resize_img
 from random import randint
 
 class Customer:
-    def __init__(self, name, instrument_names, x, y):
+    def __init__(self, name, instrument_names, x, y, player_count):
         self.name = name
         self.instrument_names = instrument_names
         self.track = self.generate_track(instrument_names.copy())
-        self.time = 50 + len(self.track)*20
         self.points = len(self.track)*10
+
+        if player_count == 1:
+            self.time = 50 + len(self.track)*20
+        else:
+            self.time = 35 + len(self.track)*18
 
         self.img = resize_img(pygame.image.load(f"assets/images/customers/{name}.png"), height=80)
         self.rect = self.img.get_rect(x=x, y=y)

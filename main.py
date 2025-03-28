@@ -8,11 +8,11 @@ from customer import Customer
 from track import Track
 from ui import UserInterface
 from mainmenu import MainMenu
-from instrument import Instrument
 from instruments.guitar import Guitar
 from instruments.drums import Drums
 from instruments.piano import Piano
 from instruments.bass import  Bass
+from instruments.computer import Computer
 
 class Game:
     def __init__(self, screen: pygame.Surface):
@@ -36,19 +36,35 @@ class Game:
         # Charger le fond
         self.background = resize_img(pygame.image.load("assets/images/studio.png"), width=screen.get_width())
         
-        # Objet joueur
-        self.player = Player(280, 600, self.screen.get_width(), self.screen.get_height())
+        # Touches
+        self.keybinds1 = {
+            'left': pygame.K_a,
+            'right': pygame.K_d,
+            'up': pygame.K_w,
+            'down': pygame.K_s,
+            'interact': pygame.K_e
+        }
 
+        self.keybinds2 = {
+            'left': pygame.K_LEFT,
+            'right': pygame.K_RIGHT,
+            'up': pygame.K_UP,
+            'down': pygame.K_DOWN,
+            'interact': pygame.K_SPACE
+        }
+
+        # Joueurs
+        self.players = []
+
+        # Instruments
         self.instrument_names = ["guitar", "bass", "drums", "piano"]
-
         self.instruments = [
             Guitar(374, 772),
             Bass(805, 375),
             Drums(727, 750),
             Piano(479, 440),
+            Computer(1191, 374)
         ]
-
-        self.computer = Instrument("computer", 1191, 374)
 
         # Collision
         self.collisions = [
@@ -82,9 +98,6 @@ class Game:
         self.sounds = {
             "points": pygame.mixer.Sound("assets/sound/cash.mp3"),
             "fail": pygame.mixer.Sound("assets/sound/fail.mp3"),
-            "switch": pygame.mixer.Sound("assets/sound/switch.mp3"),
-            "reset": pygame.mixer.Sound("assets/sound/reset.mp3"),
-            "send": pygame.mixer.Sound("assets/sound/send.mp3"),
             "10s": pygame.mixer.Sound("assets/sound/clock_ticking_10s.mp3"),
             "gameover": pygame.mixer.Sound("assets/sound/gong.mp3")
         }
@@ -92,9 +105,6 @@ class Game:
 
         self.sounds["points"].set_volume(3)
         self.sounds["fail"].set_volume(0.5)
-        self.sounds["switch"].set_volume(2)
-        self.sounds["reset"].set_volume(1.5)
-        self.sounds["send"].set_volume(1.5)
     
     def start_game(self, players, game_type):
         self.score = 0
@@ -113,6 +123,11 @@ class Game:
             self.timer = 60*6 + 1
         self.playing = True
 
+        if players == 1:
+            self.players = [Player(1, 280, 600, self.keybinds1)]
+        else:
+            self.players = [Player(1, 280, 600, self.keybinds1), Player(2, 360, 600, self.keybinds2)]
+
     def handling_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -129,62 +144,52 @@ class Game:
             
             # Touches pour jouer
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_a:
-                    self.player.dir = 'left'
-                elif event.key == pygame.K_d:
-                    self.player.dir = 'right'
-                elif event.key == pygame.K_SPACE:
+                for player in self.players:
+                    if event.key == player.keybinds['left'] and not player.playing:
+                        player.dir = 'left'
+                    elif event.key == player.keybinds['right'] and not player.playing:
+                        player.dir = 'right'
+                    elif event.key == player.keybinds['interact']:
+                        for instrument in self.instruments:
+                            if player.rect.colliderect(instrument.rect):
+                                if player.playing:
+                                    instrument.stop_playing()
+                                    player.playing = False
+                                elif not instrument.playing:
+                                    instrument.play()
+                                    player.playing = True
+
+                    # Instrument input
                     for instrument in self.instruments:
-                        if self.player.rect.colliderect(instrument.rect):
-                            instrument.play()
-                
-                elif event.key == pygame.K_c: # TESTING
-                    self.spawn_customer()
-
-                # Instrument input
-                for instrument in self.instruments:
-                    if instrument.playing:
-                        add = instrument.handle_input(event.key)
-                        if add and len(self.tracks) and len(self.tracks[self.selected_track].instruments) < self.max_instruments_per_track:
-                            self.tracks[self.selected_track].add(instrument.name)
-                        break
-
-                # Computer input
-                if self.player.rect.colliderect(self.computer.rect):
-                    if event.key == pygame.K_RIGHT:
-                        self.sounds["switch"].play()
-                        self.selected_track += 1
-                        if self.selected_track >= len(self.tracks):
-                            self.selected_track = 0
-                    elif event.key == pygame.K_LEFT:
-                        self.sounds["switch"].play()
-                        self.selected_track -= 1
-                        if self.selected_track < 0:
-                            self.selected_track = len(self.tracks) - 1
-                    elif event.key == pygame.K_RETURN:
-                        self.sounds["send"].play()
-                        if len(self.tracks) and not self.tracks[self.selected_track].sending:
-                            self.tracks[self.selected_track].send(self.now)
-                    elif event.key == pygame.K_r:
-                        if len(self.tracks) and not self.tracks[self.selected_track].sending:
-                            self.tracks[self.selected_track].reset()
-                            self.sounds["reset"].play()
+                        if instrument.playing:
+                            if isinstance(instrument, Computer):
+                                instrument.handle_input(event.key, player, self)
+                            else:
+                                add = instrument.handle_input(event.key, player)
+                                if add and len(self.tracks) and len(self.tracks[self.selected_track].instruments) < self.max_instruments_per_track:
+                                    self.tracks[self.selected_track].add(instrument.name)
+                            break
 
         # Player movement
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_w]:
-            self.player.vel[1] = -1
-        elif keys[pygame.K_s]:
-            self.player.vel[1] = 1
-        else:
-            self.player.vel[1] = 0
+        for player in self.players:
+            if not player.playing:
+                keys = pygame.key.get_pressed()
+                if keys[player.keybinds['up']]:
+                    player.vel[1] = -1
+                elif keys[player.keybinds['down']]:
+                    player.vel[1] = 1
+                else:
+                    player.vel[1] = 0
 
-        if keys[pygame.K_a]:
-            self.player.vel[0] = -1
-        elif keys[pygame.K_d]:
-            self.player.vel[0] = 1
-        else:
-            self.player.vel[0] = 0
+                if keys[player.keybinds['left']]:
+                    player.vel[0] = -1
+                elif keys[player.keybinds['right']]:
+                    player.vel[0] = 1
+                else:
+                    player.vel[0] = 0
+            else:
+                player.vel[0] = 0
+                player.vel[1] = 0
     
     def remove_customer(self, idx):
         self.free_customers_pos[self.customers_pos.index(self.customers[idx].rect.y)] = True
@@ -221,12 +226,11 @@ class Game:
             pygame.mixer.music.stop()
             self.sounds["gameover"].play()
         
-        self.player.update(self.dt, self.collisions)
+        for player in self.players:
+            player.update(self.dt, self.collisions)
         
         for instrument in self.instruments:
-            instrument.update(self.now, self.dt, self.player)
-        
-        self.computer.update(self.now, self.dt, self.player)
+            instrument.update(self.now, self.dt)
 
         despawn_idx = -1
         for i, track in enumerate(self.tracks):
@@ -256,7 +260,11 @@ class Game:
         if self.now - self.last_customer >= self.next_customer_interval:
             self.spawn_customer()
             self.last_customer = self.now
-            self.next_customer_interval = random.randint(13, 20)
+
+            if len(self.players) == 1:
+                self.next_customer_interval = random.randint(13, 20)
+            else:
+                self.next_customer_interval = random.randint(10, 15)
         
     def display(self):
         if not self.playing:
@@ -269,12 +277,11 @@ class Game:
 
         # Dessiner les instruments
         for instrument in self.instruments:
-            instrument.draw(self.screen, self.player)
-        
-        self.computer.draw(self.screen, self.player)
+            instrument.draw(self.screen, self.players)
 
-        # Dessiner le joueur
-        self.player.draw(self.screen)
+        # Dessiner les joueurs
+        for player in self.players:
+            player.draw(self.screen)
 
         # Dessiner les clients
         for customer in self.customers:
@@ -315,7 +322,7 @@ class Game:
         
         pos = self.free_customers_pos.index(True)
         self.free_customers_pos[pos] = False
-        self.customers.append(Customer(name, self.instrument_names, 1430, self.customers_pos[pos]))
+        self.customers.append(Customer(name, self.instrument_names, 1430, self.customers_pos[pos], len(self.players)))
         self.tracks.append(Track(self.instrument_names, name))
 
 pygame.init()

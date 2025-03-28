@@ -2,9 +2,10 @@ import pygame
 from utils import resize_img
 
 class Player():
-    def __init__(self, x, y, screen_width, screen_height):
-        self.idle_animation = [resize_img(pygame.image.load(f"assets/images/player/player_idle_{i}.png"), height=120) for i in range(4)]
-        self.walk_animation = [resize_img(pygame.image.load(f"assets/images/player/player_walk_{i}.png"), height=120) for i in range(6)]
+    def __init__(self, num, x, y, keybinds):
+        self.keybinds = keybinds # dictionnaire avec left, right, up, down, interact
+        self.idle_animation = [resize_img(pygame.image.load(f"assets/images/player{num}/player_idle_{i}.png"), height=120) for i in range(4)]
+        self.walk_animation = [resize_img(pygame.image.load(f"assets/images/player{num}/player_walk_{i}.png"), height=120) for i in range(6)]
         self.current_animation = self.idle_animation
         self.current_frame = 0
         self.animation_speed = 0.08  # Temps entre chaque frame de l'animation
@@ -12,6 +13,7 @@ class Player():
         self.image = self.current_animation[self.current_frame]
         self.rect = self.image.get_rect(x=x, y=y)
         self.dir = 'right'
+        self.playing = False
 
         self.hitbox = pygame.Rect(0, 0, self.rect.width*0.8, self.rect.height/4) # Seuls les pieds du joueur sont en collision avec les tiles
         self.hitbox.midbottom = self.rect.midbottom
@@ -19,9 +21,6 @@ class Player():
         self.speed = 250
         self.vel = [0, 0]
         self.is_moving = False
-
-        self.screen_width = screen_width
-        self.screen_height = screen_height
 
     def update(self, dt, collisions):
         # MOUVEMENT
@@ -59,10 +58,6 @@ class Player():
                     self.hitbox.bottom = rect.top
                 elif dy < 0:
                     self.hitbox.top = rect.bottom
-                
-        # Empêcher le joueur de sortir de l'écran
-        self.hitbox.x = max(0, min(self.hitbox.x, self.screen_width - self.rect.width))
-        self.hitbox.y = max(0, min(self.hitbox.y, self.screen_height - self.rect.height))
 
         # Placer le rect du joueur sur la hitbox
         self.rect.midbottom = self.hitbox.midbottom

@@ -30,8 +30,8 @@ class Drums(Instrument):
             self.just_started = True
         super().play()
 
-    def update(self, now, dt, player):
-        super().update(now, dt, player)
+    def update(self, now, dt):
+        super().update(now, dt)
         if self.playing:
             self.cursors_angle[self.current_cursor] += 300 * dt
 
@@ -48,18 +48,20 @@ class Drums(Instrument):
 
             screen.blit(rotated_cursor, self.cursor_rect)
 
-    def handle_input(self, key):
-        if key == pygame.K_SPACE:
+    def handle_input(self, key, player):
+        if key == player.keybinds['up']:
             if self.just_started: # La barre espace est pressée pour lancer le jeu
                 self.just_started = False
                 return False
             
-            if 270-16 < (self.cursors_angle[self.current_cursor] % 360) < 270+16:
+            if 270-18 < (self.cursors_angle[self.current_cursor] % 360) < 270+18:
                 self.sound[self.current_cursor].play()
                 self.current_cursor += 1
                 if self.current_cursor == 3:
                     self.playing = False
+                    player.playing = False
                     return True
             else:
                 self.playing = False
+                player.playing = False
         return False

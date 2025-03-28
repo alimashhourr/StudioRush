@@ -28,8 +28,8 @@ class Piano(Instrument):
             self.tiles = []
         super().play()
 
-    def update(self, now, dt, player):
-        super().update(now, dt, player)
+    def update(self, now, dt):
+        super().update(now, dt)
         if self.playing:
             if now - self.last_tile >= self.next_tile_interval:
                 self.last_tile = now
@@ -55,8 +55,8 @@ class Piano(Instrument):
         pygame.draw.rect(screen, (255, 255, 255), (self.rect.x - 36, self.rect.y - 36 - 25, 32*4 - 8, 12))
         pygame.draw.rect(screen, (0, 255, 0), (self.rect.x - 36, self.rect.y - 36 - 25, (32*4 - 8) * self.points / self.points_to_win, 12))
 
-    def handle_input(self, key):
-        keys = [pygame.K_LEFT, pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT]
+    def handle_input(self, key, player):
+        keys = [player.keybinds['left'], player.keybinds['down'], player.keybinds['up'], player.keybinds['right']]
         if not key in keys:
             return False
         key_i = keys.index(key)
@@ -70,6 +70,7 @@ class Piano(Instrument):
                     self.keynum = 0
                 if self.points >= self.points_to_win:
                     self.playing = False
+                    player.playing = False
                     return True
             else:
                 self.points = max(0, self.points - 1)
