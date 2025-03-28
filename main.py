@@ -7,11 +7,12 @@ from track import Track
 from customer import Customer
 from track import Track
 from ui import UserInterface
+from mainmenu import MainMenu
 from instrument import Instrument
 from instruments.guitar import Guitar
 from instruments.drums import Drums
 from instruments.piano import Piano
-from mainmenu import MainMenu
+from instruments.bass import  Bass
 
 class Game:
     def __init__(self, screen: pygame.Surface):
@@ -42,7 +43,7 @@ class Game:
 
         self.instruments = [
             Guitar(374, 772),
-            Instrument("bass", 805, 375),
+            Bass(805, 375),
             Drums(727, 750),
             Piano(479, 440),
         ]
