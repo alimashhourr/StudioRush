@@ -64,7 +64,7 @@ class Game:
         self.max_instruments_per_track = 8
 
         # Clients
-        self.customer_names = ["tyler", "drake", "cardib", "travis", "lilwayne", "jcole", "eminem", "xxxtentacion"]
+        self.customer_names = ["tyler", "drake", "cardib", "travis", "lilwayne", "jcole", "eminem", "xxxtentacion", "2pac", "50cent", "bigpun", "bluerag", "e40", "future", "macmiller", "nicki", "pharrell", "raekwon", "rickross"]
         self.customers = []
         self.max_customers = 7
         self.customers_pos = [300+100*i for i in range(self.max_customers)]
