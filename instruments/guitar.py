@@ -10,7 +10,7 @@ class Guitar(Instrument):
         self.arrows_img = [resize_img(pygame.image.load(f"assets/images/ui/arrow{i}.png"), width=5*4) for i in range(4)]
         self.sound = [pygame.mixer.Sound(f"assets/sound/instruments/guitar/guitar{i}.mp3") for i in range(4)]
         for i in range(4):
-            self.sound[i].set_volume(0.2)
+            self.sound[i].set_volume(0.3)
         self.last_arrow = 0
         self.next_arrow_interval = 0
         self.arrows = []
@@ -42,16 +42,14 @@ class Guitar(Instrument):
                 self.arrows.pop(despawn_idx)
                 self.points = max(0, self.points - 1)
 
-    def draw(self, screen, player):
-        super().draw(screen, player)
-        if self.playing:
-            screen.blit(self.window, (self.rect.x - 40, self.rect.y - 40))
-            for arrow in self.arrows:
-                screen.blit(self.arrows_img[arrow[0]], (self.rect.x - 40 + 3 * 4 + 7 * 4 * arrow[0], self.rect.y - 40 + 32 * 4 - arrow[1]))
-            
-            pygame.draw.rect(screen, (0, 0, 0), (self.rect.x - 40, self.rect.y - 40 - 25, 32*4, 20))
-            pygame.draw.rect(screen, (255, 255, 255), (self.rect.x - 36, self.rect.y - 36 - 25, 32*4 - 8, 12))
-            pygame.draw.rect(screen, (0, 255, 0), (self.rect.x - 36, self.rect.y - 36 - 25, (32*4 - 8) * self.points / self.points_to_win, 12))
+    def draw_interface(self, screen):
+        screen.blit(self.window, (self.rect.x - 40, self.rect.y - 40))
+        for arrow in self.arrows:
+            screen.blit(self.arrows_img[arrow[0]], (self.rect.x - 40 + 3 * 4 + 7 * 4 * arrow[0], self.rect.y - 40 + 32 * 4 - arrow[1]))
+        
+        pygame.draw.rect(screen, (0, 0, 0), (self.rect.x - 40, self.rect.y - 40 - 25, 32*4, 20))
+        pygame.draw.rect(screen, (255, 255, 255), (self.rect.x - 36, self.rect.y - 36 - 25, 32*4 - 8, 12))
+        pygame.draw.rect(screen, (0, 255, 0), (self.rect.x - 36, self.rect.y - 36 - 25, (32*4 - 8) * self.points / self.points_to_win, 12))
 
     def handle_input(self, key):
         keys = [pygame.K_LEFT, pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT]

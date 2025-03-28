@@ -46,16 +46,14 @@ class Piano(Instrument):
                 self.tiles.pop(despawn_idx)
                 self.points = max(0, self.points - 1)
 
-    def draw(self, screen, player):
-        super().draw(screen, player)
-        if self.playing:
-            screen.blit(self.window, (self.rect.x - 40, self.rect.y - 40))
-            for tile in self.tiles:
-                screen.blit(self.tiles_img[tile[2]], (self.rect.x - 40 + 3 * 4 + 7 * 4 * tile[0], self.rect.y - 40 + tile[1] - 8 * 4))
-            
-            pygame.draw.rect(screen, (0, 0, 0), (self.rect.x - 40, self.rect.y - 40 - 25, 32*4, 20))
-            pygame.draw.rect(screen, (255, 255, 255), (self.rect.x - 36, self.rect.y - 36 - 25, 32*4 - 8, 12))
-            pygame.draw.rect(screen, (0, 255, 0), (self.rect.x - 36, self.rect.y - 36 - 25, (32*4 - 8) * self.points / self.points_to_win, 12))
+    def draw_interface(self, screen):
+        screen.blit(self.window, (self.rect.x - 40, self.rect.y - 40))
+        for tile in self.tiles:
+            screen.blit(self.tiles_img[tile[2]], (self.rect.x - 40 + 3 * 4 + 7 * 4 * tile[0], self.rect.y - 40 + tile[1] - 8 * 4))
+        
+        pygame.draw.rect(screen, (0, 0, 0), (self.rect.x - 40, self.rect.y - 40 - 25, 32*4, 20))
+        pygame.draw.rect(screen, (255, 255, 255), (self.rect.x - 36, self.rect.y - 36 - 25, 32*4 - 8, 12))
+        pygame.draw.rect(screen, (0, 255, 0), (self.rect.x - 36, self.rect.y - 36 - 25, (32*4 - 8) * self.points / self.points_to_win, 12))
 
     def handle_input(self, key):
         keys = [pygame.K_LEFT, pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT]

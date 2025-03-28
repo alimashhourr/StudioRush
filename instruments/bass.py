@@ -40,14 +40,12 @@ class Bass(Instrument):
             if self.cursors_pos[self.current_cursor] < 0:
                 self.cursors_pos[self.current_cursor] = 0
                 self.cursor_dir *= -1
-
-    def draw(self, screen, player):
-        super().draw(screen, player)
-        if self.playing:
-            for i, pos in enumerate(self.cursors_pos):
-                pygame.draw.rect(screen, (255, 255, 255), (self.lines_x, self.lines_y+i*self.lines_spacing, self.lines_width, self.lines_height))
-                pygame.draw.rect(screen, (165, 165, 165), (self.lines_x + self.lines_width//2 - self.cursor_width//2, self.lines_y + i*self.lines_spacing, self.cursor_width, self.lines_height))
-                pygame.draw.rect(screen, (77, 77, 77), (self.lines_x + pos, self.lines_y + i*self.lines_spacing, self.cursor_width, self.lines_height))
+        
+    def draw_interface(self, screen):
+        for i, pos in enumerate(self.cursors_pos):
+            pygame.draw.rect(screen, (255, 255, 255), (self.lines_x, self.lines_y+i*self.lines_spacing, self.lines_width, self.lines_height))
+            pygame.draw.rect(screen, (165, 165, 165), (self.lines_x + self.lines_width//2 - self.cursor_width//2, self.lines_y + i*self.lines_spacing, self.cursor_width, self.lines_height))
+            pygame.draw.rect(screen, (77, 77, 77), (self.lines_x + pos, self.lines_y + i*self.lines_spacing, self.cursor_width, self.lines_height))
 
     def handle_input(self, key):
         if key == pygame.K_SPACE:

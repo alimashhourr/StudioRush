@@ -245,6 +245,11 @@ class Game:
             customer.draw(self.screen, self.now)
 
         # Dessiner l'interface
+        for instrument in self.instruments:
+            if instrument.playing:
+                instrument.draw_interface(self.screen)
+                break
+            
         for i, track in enumerate(self.tracks):
             track.draw(self.screen, i, i == self.selected_track, self.now)
         

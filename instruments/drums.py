@@ -35,20 +35,18 @@ class Drums(Instrument):
         if self.playing:
             self.cursors_angle[self.current_cursor] += 300 * dt
 
-    def draw(self, screen, player):
-        super().draw(screen, player)
-        if self.playing:
-            for i, angle in enumerate(self.cursors_angle):
-                circle_x = self.rect.x + 50 + 80*i
-                circle_y = self.rect.y - 50
-                screen.blit(self.circle_img, (circle_x, circle_y))
+    def draw_interface(self, screen):
+        for i, angle in enumerate(self.cursors_angle):
+            circle_x = self.rect.x + 50 + 80*i
+            circle_y = self.rect.y - 50
+            screen.blit(self.circle_img, (circle_x, circle_y))
 
-                cursor_x = circle_x + (math.cos(math.radians(angle)) + 1) * self.circle_radius*self.cursor_radius_coef + self.circle_radius * (1 - self.cursor_radius_coef)
-                cursor_y = circle_y + (math.sin(math.radians(angle)) + 1) * self.circle_radius*self.cursor_radius_coef + self.circle_radius * (1 - self.cursor_radius_coef)
-                rotated_cursor = pygame.transform.rotate(self.cursor_img, -angle - 90)
-                self.cursor_rect = rotated_cursor.get_rect(center=(cursor_x, cursor_y))
+            cursor_x = circle_x + (math.cos(math.radians(angle)) + 1) * self.circle_radius*self.cursor_radius_coef + self.circle_radius * (1 - self.cursor_radius_coef)
+            cursor_y = circle_y + (math.sin(math.radians(angle)) + 1) * self.circle_radius*self.cursor_radius_coef + self.circle_radius * (1 - self.cursor_radius_coef)
+            rotated_cursor = pygame.transform.rotate(self.cursor_img, -angle - 90)
+            self.cursor_rect = rotated_cursor.get_rect(center=(cursor_x, cursor_y))
 
-                screen.blit(rotated_cursor, self.cursor_rect)
+            screen.blit(rotated_cursor, self.cursor_rect)
 
     def handle_input(self, key):
         if key == pygame.K_SPACE:

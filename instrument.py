@@ -18,6 +18,9 @@ class Instrument():
             screen.blit(self.img_hover, self.rect)
         else:
             screen.blit(self.img, self.rect)
+    
+    def draw_interface(self, screen):
+        pass
 
     def play(self):
         self.playing = True
