@@ -70,7 +70,7 @@ class Game:
         self.customers_pos = [300+100*i for i in range(self.max_customers)]
         self.free_customers_pos = [True]*self.max_customers
         self.last_customer = 0
-        self.next_customer_interval = 5
+        self.next_customer_interval = 3
         self.served_clients = 0
 
         # Music
@@ -85,9 +85,8 @@ class Game:
         self.selected_track = 0
         self.customers = []
         self.free_customers_pos = [True]*self.max_customers
-        self.next_customer_interval = 5
         self.last_customer = self.now
-        self.next_customer_interval = 5
+        self.next_customer_interval = 3
         
         if game_type == 1:
             self.timer = 60*3 + 1
@@ -211,7 +210,7 @@ class Game:
 
         despawn_idx = -1
         for i, customer in enumerate(self.customers):
-            if customer.update(self.now):
+            if customer.update(self.now, self.dt):
                 despawn_idx = i
         
         if despawn_idx != -1:
@@ -249,7 +248,7 @@ class Game:
             if instrument.playing:
                 instrument.draw_interface(self.screen)
                 break
-            
+
         for i, track in enumerate(self.tracks):
             track.draw(self.screen, i, i == self.selected_track, self.now)
         
@@ -279,7 +278,7 @@ class Game:
         
         pos = self.free_customers_pos.index(True)
         self.free_customers_pos[pos] = False
-        self.customers.append(Customer(name, self.instrument_names, 1430, self.customers_pos[pos], self.now))
+        self.customers.append(Customer(name, self.instrument_names, 1430, self.customers_pos[pos]))
         self.tracks.append(Track(self.instrument_names, name))
 
 pygame.init()
