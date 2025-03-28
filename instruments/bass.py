@@ -17,8 +17,6 @@ class Bass(Instrument):
         self.cursor_dir = 1
         self.cursors_pos = [0]*4
 
-        self.just_started = False
-
         self.sound = [pygame.mixer.Sound(f"assets/sound/instruments/bass/bass{i}.mp3") for i in range(4)]
         for i in range(3):
             self.sound[i].set_volume(0.8)
@@ -49,10 +47,6 @@ class Bass(Instrument):
 
     def handle_input(self, key, player):
         if key == player.keybinds['up']:
-            if self.just_started: # La touche est pressée pour lancer le jeu
-                self.just_started = False
-                return False
-            
             if self.lines_width//2 - self.cursor_width//2 - 6 < (self.cursors_pos[self.current_cursor]) < self.lines_width//2 + self.cursor_width//2 + 6:
                 self.sound[self.current_cursor].play()
                 self.current_cursor += 1
